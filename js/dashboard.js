@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Проверка авторизации при загрузке страницы
 onAuthStateChanged(auth, async (user) => {
@@ -28,7 +28,7 @@ function renderDashboard(userData) {
       <div class="card">
         <h4>Выставить оценку / Выдать ДЗ</h4>
         <form id="gradeForm">
-          <input type="text" id="studentEmail" placeholder="Email ученика" required>
+          <input type="email" id="studentEmail" placeholder="Email ученика" required>
           <input type="text" id="subject" placeholder="Предмет" required>
           <input type="number" id="grade" placeholder="Оценка (1-5)" min="1" max="5" required>
           <button type="submit">Сохранить</button>
@@ -42,6 +42,33 @@ function renderDashboard(userData) {
       <div id="gradesList" class="card">Загрузка оценок...</div>
     `;
     loadStudentGrades(userData.email);
+  }
+}
+
+// Загрузка оценок ученика из Firestore
+async function loadStudentGrades(email) {
+  const container = document.getElementById("gradesList");
+
+  try {
+    const q = query(collection(db, "grades"), where("studentEmail", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      container.innerHTML = "<p>Оценок пока нет.</p>";
+      return;
+    }
+
+    let html = "<ul>";
+    querySnapshot.forEach((doc) => {
+      const item = doc.data();
+      html += `<li><strong>${item.subject}:</strong> ${item.grade} (${item.date})</li>`;
+    });
+    html += "</ul>";
+
+    container.innerHTML = html;
+  } catch (error) {
+    console.error("Ошибка при получении оценок:", error);
+    container.innerHTML = "<p>Ошибка загрузки оценок.</p>";
   }
 }
 
@@ -76,6 +103,11 @@ function initTeacherEvents() {
 }
 
 // Выход из аккаунта
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    window.location.href = "index.html";
+  });
+});
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
   signOut(auth).then(() => {
     window.location.href = "index.html";
