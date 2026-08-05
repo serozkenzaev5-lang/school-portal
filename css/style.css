@@ -43,7 +43,6 @@ body.dark-theme {
     transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Красивый глобальный фон для всех страниц */
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -55,7 +54,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Декоративные свечения на фоне */
 body::before,
 body::after {
     content: '';
@@ -82,9 +80,7 @@ body::after {
     right: -80px;
 }
 
-/* ==========================================================================
-   Страница Авторизации (index.html) — Крупная карточка
-   ========================================================================== */
+/* Авторизация */
 .auth-page {
     width: 100%;
     padding: 24px;
@@ -95,8 +91,8 @@ body::after {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     width: 100%;
-    max-width: 480px; /* Увеличена ширина */
-    padding: 44px 36px; /* Увеличены отступы */
+    max-width: 480px;
+    padding: 44px 36px;
     border-radius: 24px;
     box-shadow: var(--shadow);
     border: 1px solid var(--card-border);
@@ -134,7 +130,7 @@ body::after {
 .input-group input, 
 .input-group select {
     width: 100%;
-    padding: 16px 18px; /* Крупные поля ввода */
+    padding: 16px 18px;
     border: 1px solid var(--card-border);
     border-radius: 14px;
     font-size: 1rem;
@@ -150,22 +146,28 @@ body::after {
 }
 
 .btn-primary {
-    width: 100%;
-    padding: 16px;
-    background: var(--accent-blue);
-    color: #ffffff;
-    font-size: 1.05rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    margin-top: 8px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    width: 100% !important;
+    padding: 16px !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 14px !important;
+    cursor: pointer !important;
+    margin-top: 10px !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+    display: block !important;
+    text-align: center !important;
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
+    background-color: #1d4ed8 !important;
     transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 .auth-toggle {
@@ -184,9 +186,7 @@ body::after {
     text-decoration: underline;
 }
 
-/* ==========================================================================
-   Главный интерфейс (dashboard.html)
-   ========================================================================== */
+/* Главная страница */
 .app-layout {
     width: 100%;
     max-width: 650px;
@@ -201,7 +201,6 @@ body::after {
     border-right: 1px solid var(--card-border);
 }
 
-/* Шапка */
 .app-header {
     padding: 20px 24px;
     display: flex;
@@ -244,16 +243,6 @@ body::after {
     gap: 12px;
 }
 
-.lang-dropdown {
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid var(--card-border);
-    background: var(--input-bg);
-    color: var(--text-main);
-    cursor: pointer;
-    font-weight: bold;
-}
-
 .icon-btn {
     border: none;
     background: none;
@@ -261,10 +250,39 @@ body::after {
     cursor: pointer;
 }
 
-/* Календарная секция */
+/* Календарь */
 .calendar-section {
     padding: 20px 24px;
     border-bottom: 1px solid var(--card-border);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+.nav-arrow-btn {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent-blue, #2563eb);
+    border: 1px solid var(--card-border, #e5e7eb);
+    font-size: 1.6rem;
+    font-weight: bold;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.nav-arrow-btn:hover {
+    background: var(--accent-blue, #2563eb);
+    color: #ffffff;
 }
 
 .calendar-days {
@@ -280,6 +298,7 @@ body::after {
     align-items: center;
     gap: 8px;
     width: 40px;
+    cursor: pointer;
 }
 
 .day-name {
@@ -290,14 +309,19 @@ body::after {
 .day-num {
     font-size: 1.15rem;
     font-weight: 600;
+    color: var(--text-main);
 }
 
-.day-num.is-holiday {
-    color: var(--holiday-red);
+/* КРАСНЫЕ ЧИСЛА ДЛЯ ВЫХОДНЫХ И АВГУСТА (с высоким приоритетом) */
+.day-num.is-red,
+.day-col .day-num.is-red {
+    color: #e11d48 !important;
+    font-weight: 700 !important;
 }
 
+/* Активный выбранный день */
 .day-col.active .day-num {
-    background: var(--accent-blue);
+    background: var(--accent-blue) !important;
     color: #ffffff !important;
     width: 40px;
     height: 40px;
@@ -315,11 +339,6 @@ body::after {
     align-items: center;
 }
 
-.btn-group {
-    display: flex;
-    gap: 12px;
-}
-
 .cal-pill {
     background: var(--pill-bg);
     border: 1px solid var(--card-border);
@@ -331,12 +350,7 @@ body::after {
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-.cal-pill.icon-only {
-    padding: 10px 16px;
-    letter-spacing: 2px;
-}
-
-/* Контент и карточки */
+/* Контент и Нижнее меню */
 .app-content {
     flex: 1;
     padding: 24px;
@@ -354,7 +368,6 @@ body::after {
     padding: 18px;
     border-radius: 18px;
     border: 1px solid var(--card-border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
 
 .lesson-card {
@@ -375,7 +388,6 @@ body::after {
     font-weight: bold;
 }
 
-/* Нижнее меню */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -408,7 +420,6 @@ body::after {
 
 .hidden { display: none !important; }
 
-/* Верстка для ПК */
 @media (min-width: 768px) {
     .app-layout {
         min-height: calc(100vh - 40px);
@@ -421,66 +432,4 @@ body::after {
         max-width: 650px;
         border-radius: 0 0 24px 24px;
     }
-}
-/* Фикс кнопки авторизации */
-.btn-primary {
-    width: 100% !important;
-    padding: 16px !important;
-    background-color: #2563eb !important; /* Яркий синий цвет */
-    color: #ffffff !important;            /* Белый текст */
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    border: none !important;
-    border-radius: 14px !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
-    display: block !important;
-    text-align: center !important;
-}
-
-.btn-primary:hover {
-    background-color: #1d4ed8 !important;
-    transform: translateY(-1px);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
-}
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding: 0 8px;
-}
-
-.nav-arrow-btn {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--accent-blue, #2563eb);
-    border: 1px solid var(--card-border, #e5e7eb);
-    font-size: 1.6rem;
-    font-weight: bold;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.nav-arrow-btn:hover {
-    background: var(--accent-blue, #2563eb);
-    color: #ffffff;
-}
-
-.nav-arrow-btn:active {
-    transform: scale(0.92);
-}
-/* Красные числа для выходных и августа */
-.day-num.is-red {
-    color: #e11d48 !important; /* Яркий красный цвет */
-    font-weight: 600;
 }
