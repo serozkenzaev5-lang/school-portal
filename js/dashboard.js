@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const defaultSchedule = {
   1: ["Математика", "Русский язык", "История", "Физика"],
@@ -16,29 +16,36 @@ const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 let selectedDate = new Date();
+let currentUserData = null;
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (userDoc.exists()) {
-      initDashboard(userDoc.data());
+      currentUserData = { id: user.uid, ...userDoc.data() };
     } else {
-      initDashboard({ name: "Шероз Кенжаев", role: "Ученик" });
+      currentUserData = { id: user.uid, name: "Пользователь", role: "student" };
     }
   } else {
-    initDashboard({ name: "Шероз Кенжаев", role: "Ученик" });
+    currentUserData = { id: "demo", name: "Шероз Кенжаев", role: "teacher" };
   }
+  initDashboard();
 });
 
-function initDashboard(userData) {
+function initDashboard() {
   const userNameEl = document.getElementById("userName");
-  if (userNameEl) userNameEl.innerText = userData.name;
+  const userRoleEl = document.getElementById("userRole");
+  
+  if (userNameEl) userNameEl.innerText = currentUserData.name;
+  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
 
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
+  setupTeacherControls();
+  loadGrades();
+  loadTasks();
 
-  // Переключение по стрелкам
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -65,7 +72,6 @@ function renderCalendar() {
 
   container.innerHTML = "";
 
-  // Вычисляем понедельник недели
   const startOfWeek = new Date(selectedDate);
   const dayIndex = startOfWeek.getDay();
   const diffToMon = startOfWeek.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
@@ -80,19 +86,16 @@ function renderCalendar() {
     day.setDate(startOfWeek.getDate() + i);
 
     const isSelected = day.toDateString() === selectedDate.toDateString();
-    const dayOfWeek = day.getDay(); // 0 - Воскресенье, 6 - Суббота
-    const month = day.getMonth();   // 7 - Август (так как отсчет с 0)
+    const dayOfWeek = day.getDay();
+    const month = day.getMonth();
 
-    // ЛОГИКА КРАСНОГО ЦВЕТА:
-    // 1. Если август (месяц === 7) -> красный
-    // 2. Если суббота (6) или воскресенье (0) -> красный
-    const isHolidayOrWeekend = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
+    const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
 
     const dayEl = document.createElement("div");
     dayEl.className = `day-col ${isSelected ? "active" : ""}`;
     dayEl.innerHTML = `
       <span class="day-name">${dayNames[i]}</span>
-      <span class="day-num ${isHolidayOrWeekend ? "is-red" : ""}">${day.getDate()}</span>
+      <span class="day-num ${isRedDay ? "is-red" : ""}">${day.getDate()}</span>
     `;
 
     dayEl.addEventListener("click", () => {
@@ -114,7 +117,6 @@ function renderScheduleForDate(date) {
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   if (dateTitle) dateTitle.innerText = `Расписание на ${date.toLocaleDateString('ru-RU', options)}`;
 
-  // Каникулы в августе (до 1 сентября)
   const schoolStart = new Date(2026, 8, 1);
   const isVacation = date < schoolStart;
 
@@ -142,6 +144,147 @@ function renderScheduleForDate(date) {
     `;
     scheduleContainer.appendChild(card);
   });
+}
+
+// ---------------- ПОДДЕРЖКА УЧИТЕЛЯ И ОЦЕНОК ----------------
+
+function setupTeacherControls() {
+  if (currentUserData.role === 'teacher') {
+    document.getElementById('teacherGradePanel')?.classList.remove('hidden');
+    document.getElementById('teacherTaskPanel')?.classList.remove('hidden');
+    loadStudentsList();
+  }
+}
+
+async function loadStudentsList() {
+  const select = document.getElementById('gradeStudentSelect');
+  if (!select) return;
+  select.innerHTML = `<option value="" disabled selected>Выберите ученика</option>`;
+  
+  try {
+    const q = query(collection(db, "users"), where("role", "==", "student"));
+    const querySnapshot = await getDocs(q);
+    
+    querySnapshot.forEach((docSnap) => {
+      const student = docSnap.data();
+      const opt = document.createElement('option');
+      opt.value = docSnap.id;
+      opt.textContent = student.name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.log("Демо-режим выбора учеников");
+  }
+}
+
+document.getElementById('addGradeForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const studentId = document.getElementById('gradeStudentSelect').value;
+  const subject = document.getElementById('gradeSubjectSelect').value;
+  const value = document.getElementById('gradeValueSelect').value;
+  const reason = document.getElementById('gradeReasonInput').value;
+
+  try {
+    await addDoc(collection(db, "grades"), {
+      studentId,
+      subject,
+      value,
+      reason,
+      date: new Date().toISOString().split('T')[0],
+      createdAt: serverTimestamp()
+    });
+    alert("Отметка успешно выставлена!");
+    document.getElementById('addGradeForm').reset();
+    loadGrades();
+  } catch (err) {
+    alert("Ошибка сохранения оценки.");
+  }
+});
+
+document.getElementById('addTaskForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const subject = document.getElementById('taskSubjectSelect').value;
+  const dueDate = document.getElementById('taskDueDate').value;
+  const description = document.getElementById('taskDescInput').value;
+
+  try {
+    await addDoc(collection(db, "tasks"), {
+      subject,
+      dueDate,
+      description,
+      createdAt: serverTimestamp()
+    });
+    alert("Домашнее задание опубликовано!");
+    document.getElementById('addTaskForm').reset();
+    loadTasks();
+  } catch (err) {
+    alert("Ошибка добавления ДЗ.");
+  }
+});
+
+async function loadGrades() {
+  const container = document.getElementById('gradesList');
+  if (!container) return;
+  container.innerHTML = "";
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "grades"));
+    if (querySnapshot.empty) {
+      container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const g = docSnap.data();
+      let badgeClass = "grade-num";
+      if (g.value === "Б") badgeClass = "status-b";
+      if (g.value === "П") badgeClass = "status-p";
+
+      const card = document.createElement("div");
+      card.className = "card grade-card";
+      card.innerHTML = `
+        <div class="grade-badge ${badgeClass}">${g.value}</div>
+        <div class="grade-details">
+          <h4>${g.subject}</h4>
+          <p class="grade-reason">Причина: ${g.reason}</p>
+          <small class="grade-date">Дата: ${g.date}</small>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    container.innerHTML = `<div class="card"><p>Список оценок пуст.</p></div>`;
+  }
+}
+
+async function loadTasks() {
+  const container = document.getElementById('tasksList');
+  if (!container) return;
+  container.innerHTML = "";
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "tasks"));
+    if (querySnapshot.empty) {
+      container.innerHTML = `<div class="card"><p>Заданий пока нет.</p></div>`;
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const task = docSnap.data();
+      const card = document.createElement("div");
+      card.className = "card task-card";
+      card.innerHTML = `
+        <h4>${task.subject}</h4>
+        <p>${task.description}</p>
+        <small style="color:var(--text-muted)">Сдать до: ${task.dueDate}</small>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    container.innerHTML = `<div class="card"><p>Список заданий пуст.</p></div>`;
+  }
 }
 
 function initBottomNav() {
