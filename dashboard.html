@@ -10,7 +10,6 @@
 <body class="light-theme">
 
     <div class="app-layout">
-        <!-- Шапка -->
         <header class="app-header">
             <div class="user-profile">
                 <div class="avatar" id="userAvatar">ШК</div>
@@ -20,16 +19,20 @@
                 </div>
             </div>
             <div class="header-actions">
+                <select id="langSelect" class="lang-dropdown">
+                    <option value="ru">RU</option>
+                    <option value="en">EN</option>
+                    <option value="uz">UZ</option>
+                </select>
                 <button id="logoutBtn" class="icon-btn" title="Выйти">🚪</button>
             </div>
         </header>
 
-        <!-- Календарь -->
         <section class="calendar-section">
             <div class="calendar-header">
-                <button id="prevWeekBtn" class="nav-arrow-btn">‹</button>
+                <button id="prevWeekBtn" class="nav-arrow-btn" aria-label="Предыдущая неделя">‹</button>
                 <h3 id="currentMonthYear">Август 2026</h3>
-                <button id="nextWeekBtn" class="nav-arrow-btn">›</button>
+                <button id="nextWeekBtn" class="nav-arrow-btn" aria-label="Следующая неделя">›</button>
             </div>
             
             <div class="calendar-days" id="calendarDays"></div>
@@ -40,19 +43,15 @@
             </div>
         </section>
 
-        <!-- Контент -->
         <main class="app-content">
-            <!-- Вкладка: Расписание -->
             <div id="tab-schedule" class="tab-page">
                 <h3 id="selectedDateTitle" style="margin-bottom: 16px;">Расписание</h3>
                 <div id="scheduleList" class="card-list"></div>
             </div>
 
-            <!-- Вкладка: Оценки -->
             <div id="tab-grades" class="tab-page hidden">
                 <h3 style="margin-bottom: 16px;">Успеваемость и отметки</h3>
                 
-                <!-- Панель учителя: Форма выставления оценки -->
                 <div id="teacherGradePanel" class="card hidden" style="margin-bottom: 20px;">
                     <h4>Выставить оценку / отметку</h4>
                     <form id="addGradeForm" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
@@ -74,7 +73,7 @@
                             <option value="Б">Б (Болеет)</option>
                             <option value="П">П (Прогулял)</option>
                         </select>
-                        <input type="text" id="gradeReasonInput" placeholder="Причина (например: Самостоятельная работа)" class="input-text" required>
+                        <input type="text" id="gradeReasonInput" placeholder="Причина (например: Контрольная работа)" class="input-text" required>
                         <button type="submit" class="btn-primary">Сохранить отметку</button>
                     </form>
                 </div>
@@ -82,11 +81,9 @@
                 <div id="gradesList" class="card-list"></div>
             </div>
 
-            <!-- Вкладка: Задания -->
             <div id="tab-tasks" class="tab-page hidden">
                 <h3 style="margin-bottom: 16px;">Домашние задания</h3>
 
-                <!-- Панель учителя: Публикация ДЗ -->
                 <div id="teacherTaskPanel" class="card hidden" style="margin-bottom: 20px;">
                     <h4>Добавить домашнее задание</h4>
                     <form id="addTaskForm" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
@@ -107,23 +104,7 @@
             </div>
         </main>
 
-        <!-- Навигация -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-tab="schedule">
                 <span>📅</span>
-                <small>Расписание</small>
-            </button>
-            <button class="nav-item" data-tab="grades">
-                <span>⭐</span>
-                <small>Оценки</small>
-            </button>
-            <button class="nav-item" data-tab="tasks">
-                <span>✔</span>
-                <small>Задания</small>
-            </button>
-        </nav>
-    </div>
-
-    <script type="module" src="js/dashboard.js"></script>
-</body>
-</html>
+                <small>Расписание
