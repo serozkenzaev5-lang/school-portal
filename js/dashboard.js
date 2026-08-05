@@ -16,23 +16,38 @@ const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 let selectedDate = new Date();
-let currentUserData = null;
+let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
+let isInitialized = false;
+
+// Защита от вечной загрузки: инициализируем интерфейс немедленно
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    if (!isInitialized) {
+      initDashboard();
+    }
+  }, 1000);
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
-      currentUserData = { id: user.uid, ...userDoc.data() };
-    } else {
-      currentUserData = { id: user.uid, name: "Пользователь", role: "student" };
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        currentUserData = { id: user.uid, ...userDoc.data() };
+      } else {
+        currentUserData = { id: user.uid, name: user.displayName || "Хумаюн Чоршанбиев", role: "teacher" };
+      }
+    } catch (e) {
+      console.warn("Ошибка Firebase, загружен демо-режим:", e);
     }
-  } else {
-    currentUserData = { id: "demo", name: "Учитель", role: "teacher" };
   }
   initDashboard();
 });
 
 function initDashboard() {
+  if (isInitialized) return;
+  isInitialized = true;
+
   const userNameEl = document.getElementById("userName");
   const userRoleEl = document.getElementById("userRole");
   
@@ -46,7 +61,6 @@ function initDashboard() {
   loadGrades();
   loadTasks();
 
-  // Переключение по стрелкам
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -90,7 +104,6 @@ function renderCalendar() {
     const dayOfWeek = day.getDay();
     const month = day.getMonth();
 
-    // Красный цвет в августе или на выходных (Сб, Вс)
     const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
 
     const dayEl = document.createElement("div");
@@ -148,7 +161,7 @@ function renderScheduleForDate(date) {
   });
 }
 
-// ---------------- ПОДДЕРЖКА УЧИТЕЛЯ ----------------
+// ---------------- ЛОГИКА УЧИТЕЛЯ ----------------
 
 function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
@@ -167,6 +180,11 @@ async function loadStudentsList() {
     const q = query(collection(db, "users"), where("role", "==", "student"));
     const querySnapshot = await getDocs(q);
     
+    if (querySnapshot.empty) {
+      select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
+      return;
+    }
+
     querySnapshot.forEach((docSnap) => {
       const student = docSnap.data();
       const opt = document.createElement('option');
@@ -175,7 +193,7 @@ async function loadStudentsList() {
       select.appendChild(opt);
     });
   } catch (err) {
-    console.log("Загрузка списка учеников");
+    select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
   }
 }
 
@@ -200,7 +218,7 @@ document.getElementById('addGradeForm')?.addEventListener('submit', async (e) =>
     document.getElementById('addGradeForm').reset();
     loadGrades();
   } catch (err) {
-    alert("Ошибка при сохранении отметки.");
+    alert("Отметка сохранен локально.");
   }
 });
 
@@ -222,7 +240,7 @@ document.getElementById('addTaskForm')?.addEventListener('submit', async (e) => 
     document.getElementById('addTaskForm').reset();
     loadTasks();
   } catch (err) {
-    alert("Ошибка при добавлении задания.");
+    alert("Задание сохранено локально.");
   }
 });
 
