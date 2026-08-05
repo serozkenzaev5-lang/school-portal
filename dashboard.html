@@ -3,123 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный Портал</title>
-    <link rel="shortcut icon" href="#">
+    <title>Школьный Портал — Личный кабинет</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="light-theme">
+<body class="dark-theme">
+
     <div class="app-layout">
         <!-- Шапка сайта -->
         <header class="app-header">
             <div class="user-profile">
-                <div class="avatar" id="userAvatar">ШК</div>
+                <div class="avatar" id="userAvatar">У</div>
                 <div class="user-details">
                     <h2 id="userName">Загрузка...</h2>
-                    <span id="userRole" class="role-badge" data-i18n="roleStudent">Ученик</span>
+                    <span class="role-badge" id="userRole">Ученик</span>
                 </div>
             </div>
-            
-            <!-- Настройки: Тема и Язык -->
             <div class="header-actions">
                 <select id="langSelect" class="lang-dropdown">
                     <option value="ru">RU</option>
                     <option value="en">EN</option>
                     <option value="uz">UZ</option>
                 </select>
-                <button id="themeToggle" class="icon-btn">🌙</button>
                 <button id="logoutBtn" class="icon-btn" title="Выйти">🚪</button>
             </div>
         </header>
 
-        <!-- Календарная панель (в точности как на скрине) -->
-        <div class="calendar-section">
-            <div class="calendar-days">
-                <div class="day-col">
-                    <span class="day-name" data-i18n="mon">Пн</span>
-                    <span class="day-num is-holiday">3</span>
-                </div>
-                <div class="day-col">
-                    <span class="day-name" data-i18n="tue">Вт</span>
-                    <span class="day-num is-holiday">4</span>
-                </div>
-                <div class="day-col active">
-                    <span class="day-name" data-i18n="wed">Ср</span>
-                    <span class="day-num">5</span>
-                </div>
-                <div class="day-col">
-                    <span class="day-name" data-i18n="thu">Чт</span>
-                    <span class="day-num is-holiday">6</span>
-                </div>
-                <div class="day-col">
-                    <span class="day-name" data-i18n="fri">Пт</span>
-                    <span class="day-num is-holiday">7</span>
-                </div>
-                <div class="day-col">
-                    <span class="day-name" data-i18n="sat">Сб</span>
-                    <span class="day-num is-holiday">8</span>
-                </div>
-                <div class="day-col">
-                    <span class="day-name" data-i18n="sun">Вс</span>
-                    <span class="day-num is-holiday">9</span>
-                </div>
+        <!-- Интерактивный Календарь -->
+        <section class="calendar-section">
+            <div class="calendar-header">
+                <button id="prevWeek" class="icon-btn">‹</button>
+                <h3 id="currentMonthYear">Сентябрь 2026</h3>
+                <button id="nextWeek" class="icon-btn">›</button>
             </div>
+            
+            <div class="calendar-days" id="calendarDays"></div>
 
             <div class="calendar-controls">
-                <div class="btn-group">
-                    <button class="cal-pill" id="monthBtn" data-i18n="august">Август</button>
-                    <button class="cal-pill" id="todayBtn" data-i18n="today">Сегодня</button>
-                </div>
-                <button class="cal-pill icon-only">•••</button>
+                <button class="cal-pill active" id="btnToday">Сегодня</button>
+                <button class="cal-pill icon-only" id="themeToggle">☀️</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Контент страниц -->
+        <!-- Основной контент -->
         <main class="app-content">
-            <section id="tab-schedule" class="tab-page active">
-                <div class="card-list">
-                    <div class="card lesson-card">
-                        <span class="lesson-num">1</span>
-                        <div class="lesson-info">
-                            <h4 data-i18n="math">Математика</h4>
-                            <p>08:30 - 09:15</p>
-                        </div>
-                    </div>
-                    <div class="card lesson-card">
-                        <span class="lesson-num">2</span>
-                        <div class="lesson-info">
-                            <h4 data-i18n="rus">Русский язык</h4>
-                            <p>09:25 - 10:10</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <div id="tab-schedule" class="tab-page">
+                <h3 id="selectedDateTitle" style="margin-bottom: 16px;">Расписание</h3>
+                <div id="scheduleList" class="card-list"></div>
+            </div>
 
-            <section id="tab-grades" class="tab-page hidden">
-                <h3 data-i18n="gradesTitle">Дневник успеваемости</h3>
-                <div id="gradesList" class="card-list">Загрузка...</div>
-            </section>
+            <div id="tab-grades" class="tab-page hidden">
+                <h3 style="margin-bottom: 16px;">Дневник успеваемости</h3>
+                <div id="gradesList" class="card-list"></div>
+            </div>
 
-            <section id="tab-homework" class="tab-page hidden">
-                <h3 data-i18n="hwTitle">Домашнее задание</h3>
-                <div class="card-list">
-                    <div class="card"><strong data-i18n="math">Математика</strong>: №124, №125</div>
+            <div id="tab-tasks" class="tab-page hidden">
+                <h3 style="margin-bottom: 16px;">Домашние задания</h3>
+                <div class="card">
+                    <p>Заданий пока нет.</p>
                 </div>
-            </section>
+            </div>
         </main>
 
-        <!-- Нижнее меню -->
+        <!-- Нижнее меню навигации -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-tab="schedule">
-                <span class="nav-icon">📅</span>
-                <span class="nav-label" data-i18n="navSchedule">Расписание</span>
+                <span>📅</span>
+                <small>Расписание</small>
             </button>
             <button class="nav-item" data-tab="grades">
-                <span class="nav-icon">⭐</span>
-                <span class="nav-label" data-i18n="navGrades">Оценки</span>
+                <span>📊</span>
+                <small>Оценки</small>
             </button>
-            <button class="nav-item" data-tab="homework">
-                <span class="nav-icon">📝</span>
-                <span class="nav-label" data-i18n="navHw">Задания</span>
+            <button class="nav-item" data-tab="tasks">
+                <span>📝</span>
+                <small>Задания</small>
             </button>
         </nav>
     </div>
