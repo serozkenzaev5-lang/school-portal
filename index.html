@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Школьный Портал</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <!-- ФОРМА ВХОДА -->
+        <form id="loginForm" class="card">
+            <h2>Вход в портал</h2>
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginPassword" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+            <p>Еще нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
+        </form>
+
+        <!-- ФОРМА РЕГИСТРАЦИИ (скрыта по умолчанию) -->
+        <form id="registerForm" class="card hidden">
+            <h2>Регистрация</h2>
+            <input type="text" id="regName" placeholder="ФИО / Имя" required>
+            <input type="email" id="regEmail" placeholder="Email" required>
+            <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
+            
+            <label for="regRole">Выберите роль:</label>
+            <select id="regRole" required>
+                <option value="student">Ученик</option>
+                <option value="teacher">Учитель</option>
+                <option value="parent">Родитель</option>
+            </select>
+
+            <button type="submit">Зарегистрироваться</button>
+            <p>Уже есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
+        </form>
+    </div>
+
+    <!-- ВАЖНО: тип module позволяет использовать import/export в JS -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
