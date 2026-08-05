@@ -447,3 +447,35 @@ body::after {
 .btn-primary:active {
     transform: translateY(0);
 }
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
+
+.nav-arrow-btn {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent-blue, #2563eb);
+    border: 1px solid var(--card-border, #e5e7eb);
+    font-size: 1.6rem;
+    font-weight: bold;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.nav-arrow-btn:hover {
+    background: var(--accent-blue, #2563eb);
+    color: #ffffff;
+}
+
+.nav-arrow-btn:active {
+    transform: scale(0.92);
+}
