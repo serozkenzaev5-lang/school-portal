@@ -1,11 +1,26 @@
-:root {
-    --bg-app: #f4f6f9;
-    --card-bg: #ffffff;
-    --primary: #2563eb;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --radius: 16px;
+/* ==========================================================================
+   Variables & Theme System
+   ========================================================================== */
+body.light-theme {
+    --bg-main: #f2f4f8;
+    --bg-card: #ffffff;
+    --text-main: #1c1d21;
+    --text-muted: #8e8e93;
+    --accent-blue: #3b82f6;
+    --border-color: #e5e7eb;
+    --holiday-red: #e11d48;
+    --pill-bg: #ffffff;
+}
+
+body.dark-theme {
+    --bg-main: #121214;
+    --bg-card: #1e1e24;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --accent-blue: #3b82f6;
+    --border-color: #2e2e38;
+    --holiday-red: #fb7185;
+    --pill-bg: #272730;
 }
 
 * {
@@ -13,33 +28,32 @@
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    transition: background-color 0.25s, color 0.25s;
 }
 
 body {
-    background-color: var(--bg-app);
-    color: var(--text-dark);
+    background-color: var(--bg-main);
+    color: var(--text-main);
     display: flex;
     justify-content: center;
 }
 
 .app-layout {
     width: 100%;
-    max-width: 600px; /* На ПК будет выглядеть как мобильное приложение */
+    max-width: 600px;
     min-height: 100vh;
-    background: #f8fafc;
+    background-color: var(--bg-main);
     display: flex;
     flex-direction: column;
-    position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* Шапка */
+/* Header */
 .app-header {
     padding: 16px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
+    background: var(--bg-card);
 }
 
 .user-profile {
@@ -49,10 +63,10 @@ body {
 }
 
 .avatar {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: var(--primary);
+    background: var(--accent-blue);
     color: #fff;
     display: flex;
     align-items: center;
@@ -60,13 +74,20 @@ body {
     font-weight: bold;
 }
 
-.user-details h2 {
-    font-size: 1.1rem;
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.role-badge {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+.lang-dropdown {
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-main);
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .icon-btn {
@@ -76,44 +97,85 @@ body {
     cursor: pointer;
 }
 
-/* Календарная плашка */
-.calendar-bar {
-    background: #fff;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
+/* Calendar Section (Точно по дизайну) */
+.calendar-section {
+    padding: 16px 20px;
+    background: var(--bg-main);
 }
 
 .calendar-days {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.day-item {
+.day-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 8px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
+    gap: 8px;
+    width: 36px;
+}
+
+.day-name {
+    font-size: 0.9rem;
     color: var(--text-muted);
 }
 
-.day-item.active {
-    background: var(--primary);
-    color: #fff;
+.day-num {
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
-.day-item.weekend strong {
-    color: #ef4444;
-}
-.day-item.active.weekend strong {
-    color: #fff;
+.day-num.is-holiday {
+    color: var(--holiday-red); /* Красный цвет для выходных/праздничных дней */
 }
 
-/* Контент */
+/* Активный выбранный день (синий круг) */
+.day-col.active .day-num {
+    background: var(--accent-blue);
+    color: #ffffff !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.cal-pill {
+    background: var(--pill-bg);
+    border: 1px solid var(--border-color);
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.cal-pill.icon-only {
+    padding: 8px 14px;
+    letter-spacing: 2px;
+}
+
+/* Content & Navigation */
 .app-content {
     flex: 1;
-    padding: 16px;
+    padding: 20px;
     padding-bottom: 80px;
 }
 
@@ -124,11 +186,10 @@ body {
 }
 
 .card {
-    background: var(--card-bg);
+    background: var(--bg-card);
     padding: 16px;
-    border-radius: var(--radius);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    border: 1px solid var(--border);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
 }
 
 .lesson-card {
@@ -140,8 +201,8 @@ body {
 .lesson-num {
     width: 32px;
     height: 32px;
-    background: #eff6ff;
-    color: var(--primary);
+    background: var(--bg-main);
+    color: var(--accent-blue);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -149,19 +210,17 @@ body {
     font-weight: bold;
 }
 
-/* Навигация (Bottom Bar) */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     width: 100%;
     max-width: 600px;
     height: 65px;
-    background: #ffffff;
-    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 10;
 }
 
 .nav-item {
@@ -176,33 +235,7 @@ body {
 }
 
 .nav-item.active {
-    color: var(--primary);
+    color: var(--accent-blue);
 }
 
-.nav-icon {
-    font-size: 1.2rem;
-}
-
-.nav-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Адаптив под большой экран ПК */
-@media (min-width: 768px) {
-    .app-layout {
-        max-width: 900px;
-        margin-top: 20px;
-        min-height: calc(100vh - 40px);
-        border-radius: 20px;
-        overflow: hidden;
-    }
-    .bottom-nav {
-        max-width: 900px;
-        border-radius: 0 0 20px 20px;
-    }
-}
+.hidden { display: none !important; }
