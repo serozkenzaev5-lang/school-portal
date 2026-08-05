@@ -7,34 +7,27 @@
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="dark-theme">
+<body class="light-theme">
 
     <div class="app-layout">
-        <!-- Шапка сайта -->
         <header class="app-header">
             <div class="user-profile">
-                <div class="avatar" id="userAvatar">У</div>
+                <div class="avatar" id="userAvatar">ШК</div>
                 <div class="user-details">
-                    <h2 id="userName">Загрузка...</h2>
+                    <h2 id="userName">Шероз Кенжаев</h2>
                     <span class="role-badge" id="userRole">Ученик</span>
                 </div>
             </div>
             <div class="header-actions">
-                <select id="langSelect" class="lang-dropdown">
-                    <option value="ru">RU</option>
-                    <option value="en">EN</option>
-                    <option value="uz">UZ</option>
-                </select>
                 <button id="logoutBtn" class="icon-btn" title="Выйти">🚪</button>
             </div>
         </header>
 
-        <!-- Интерактивный Календарь -->
         <section class="calendar-section">
             <div class="calendar-header">
-                <button id="prevWeek" class="icon-btn">‹</button>
-                <h3 id="currentMonthYear">Сентябрь 2026</h3>
-                <button id="nextWeek" class="icon-btn">›</button>
+                <button id="prevWeekBtn" class="nav-arrow-btn" aria-label="Предыдущая неделя">‹</button>
+                <h3 id="currentMonthYear">Август 2026</h3>
+                <button id="nextWeekBtn" class="nav-arrow-btn" aria-label="Следующая неделя">›</button>
             </div>
             
             <div class="calendar-days" id="calendarDays"></div>
@@ -45,7 +38,6 @@
             </div>
         </section>
 
-        <!-- Основной контент -->
         <main class="app-content">
             <div id="tab-schedule" class="tab-page">
                 <h3 id="selectedDateTitle" style="margin-bottom: 16px;">Расписание</h3>
@@ -53,30 +45,27 @@
             </div>
 
             <div id="tab-grades" class="tab-page hidden">
-                <h3 style="margin-bottom: 16px;">Дневник успеваемости</h3>
-                <div id="gradesList" class="card-list"></div>
+                <h3 style="margin-bottom: 16px;">Оценки</h3>
+                <div class="card"><p>Раздел оценок пуст.</p></div>
             </div>
 
             <div id="tab-tasks" class="tab-page hidden">
-                <h3 style="margin-bottom: 16px;">Домашние задания</h3>
-                <div class="card">
-                    <p>Заданий пока нет.</p>
-                </div>
+                <h3 style="margin-bottom: 16px;">Задания</h3>
+                <div class="card"><p>Заданий нет.</p></div>
             </div>
         </main>
 
-        <!-- Нижнее меню навигации -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-tab="schedule">
                 <span>📅</span>
                 <small>Расписание</small>
             </button>
             <button class="nav-item" data-tab="grades">
-                <span>📊</span>
+                <span>⭐</span>
                 <small>Оценки</small>
             </button>
             <button class="nav-item" data-tab="tasks">
-                <span>📝</span>
+                <span>✔</span>
                 <small>Задания</small>
             </button>
         </nav>
