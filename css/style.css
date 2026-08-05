@@ -80,112 +80,6 @@ body::after {
     right: -80px;
 }
 
-/* Авторизация */
-.auth-page {
-    width: 100%;
-    padding: 24px;
-}
-
-.auth-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    width: 100%;
-    max-width: 480px;
-    padding: 44px 36px;
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--card-border);
-    text-align: center;
-    margin: auto;
-}
-
-.auth-header {
-    margin-bottom: 32px;
-}
-
-.school-logo {
-    font-size: 3.2rem;
-    margin-bottom: 12px;
-}
-
-.auth-header h2 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 8px;
-}
-
-.auth-header p {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.input-group input, 
-.input-group select {
-    width: 100%;
-    padding: 16px 18px;
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    font-size: 1rem;
-    background-color: var(--input-bg);
-    color: var(--text-main);
-    outline: none;
-}
-
-.input-group input:focus, 
-.input-group select:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
-}
-
-.btn-primary {
-    width: 100% !important;
-    padding: 16px !important;
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    border: none !important;
-    border-radius: 14px !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
-    display: block !important;
-    text-align: center !important;
-}
-
-.btn-primary:hover {
-    background-color: #1d4ed8 !important;
-    transform: translateY(-1px);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
-}
-
-.auth-toggle {
-    margin-top: 16px;
-    font-size: 0.95rem;
-    color: var(--text-muted);
-}
-
-.auth-toggle a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.auth-toggle a:hover {
-    text-decoration: underline;
-}
-
 /* Главная страница */
 .app-layout {
     width: 100%;
@@ -241,6 +135,19 @@ body::after {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+/* Выбор языка */
+.lang-dropdown {
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--input-bg);
+    color: var(--text-main);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    outline: none;
 }
 
 .icon-btn {
@@ -312,14 +219,14 @@ body::after {
     color: var(--text-main);
 }
 
-/* КРАСНЫЕ ЧИСЛА ДЛЯ ВЫХОДНЫХ И АВГУСТА (с высоким приоритетом) */
+/* Красные даты для выходных и августа */
 .day-num.is-red,
 .day-col .day-num.is-red {
     color: #e11d48 !important;
     font-weight: 700 !important;
 }
 
-/* Активный выбранный день */
+/* Выбранный день */
 .day-col.active .day-num {
     background: var(--accent-blue) !important;
     color: #ffffff !important;
@@ -350,7 +257,7 @@ body::after {
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-/* Контент и Нижнее меню */
+/* Контент и карточки */
 .app-content {
     flex: 1;
     padding: 24px;
@@ -388,6 +295,74 @@ body::after {
     font-weight: bold;
 }
 
+/* Формы учителя */
+.input-select,
+.input-text {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.btn-primary {
+    width: 100% !important;
+    padding: 14px !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    text-align: center !important;
+}
+
+/* Карточка оценки */
+.grade-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.grade-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.grade-badge.status-b {
+    background-color: #f59e0b !important; /* Болеет (оранжевый) */
+    color: #ffffff !important;
+}
+
+.grade-badge.status-p {
+    background-color: #ef4444 !important; /* Прогулял (красный) */
+    color: #ffffff !important;
+}
+
+.grade-reason {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 2px 0;
+}
+
+.grade-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Нижнее меню */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -432,58 +407,4 @@ body::after {
         max-width: 650px;
         border-radius: 0 0 24px 24px;
     }
-}
-/* Поля ввода в формах учителя */
-.input-select,
-.input-text {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    background: var(--input-bg);
-    color: var(--text-main);
-    font-size: 0.95rem;
-    outline: none;
-}
-
-/* Карточка оценки */
-.grade-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.grade-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--accent-blue);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-/* Статусы Б и П */
-.grade-badge.status-b {
-    background-color: #f59e0b !important; /* Оранжевый - Болеет */
-    color: #ffffff !important;
-}
-
-.grade-badge.status-p {
-    background-color: #ef4444 !important; /* Красный - Прогулял */
-    color: #ffffff !important;
-}
-
-.grade-reason {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 2px 0;
-}
-
-.grade-date {
-    font-size: 0.8rem;
-    color: var(--text-muted);
 }
