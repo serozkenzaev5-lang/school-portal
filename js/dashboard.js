@@ -1,77 +1,143 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Slovar perevodov
-const translations = {
-  ru: {
-    roleStudent: "Ученик", roleTeacher: "Учитель", roleParent: "Родитель",
-    august: "Август", today: "Сегодня",
-    mon: "Пн", tue: "Вт", wed: "Ср", thu: "Чт", fri: "Пт", sat: "Сб", sun: "Вс",
-    navSchedule: "Расписание", navGrades: "Оценки", navHw: "Задания",
-    math: "Математика", rus: "Русский язык",
-    gradesTitle: "Дневник успеваемости", hwTitle: "Домашнее задание",
-    noGrades: "Оценок пока нет.", errGrades: "Ошибка загрузки оценок."
-  },
-  en: {
-    roleStudent: "Student", roleTeacher: "Teacher", roleParent: "Parent",
-    august: "August", today: "Today",
-    mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun",
-    navSchedule: "Schedule", navGrades: "Grades", navHw: "Tasks",
-    math: "Mathematics", rus: "Russian Language",
-    gradesTitle: "Gradebook", hwTitle: "Homework",
-    noGrades: "No grades yet.", errGrades: "Error loading grades."
-  },
-  uz: {
-    roleStudent: "O'quvchi", roleTeacher: "O'qituvchi", roleParent: "Ota-ona",
-    august: "Avgust", today: "Bugun",
-    mon: "Du", tue: "Se", wed: "Ch", thu: "Pa", fri: "Ju", sat: "Sh", sun: "Yak",
-    navSchedule: "Dars jadvali", navGrades: "Baholar", navHw: "Vazifalar",
-    math: "Matematika", rus: "Rus tili",
-    gradesTitle: "Baholar kundaligi", hwTitle: "Uy vazifasi",
-    noGrades: "Hozircha baholar yo'q.", errGrades: "Baholarni yuklashda xatolik."
-  }
+const defaultSchedule = {
+  1: ["Математика", "Русский язык", "История", "Физика"],
+  2: ["Английский язык", "Информатика", "Геометрия", "Биология"],
+  3: ["Математика", "География", "Химия", "Литература"],
+  4: ["Русский язык", "Обществознание", "Физкультура", "Английский язык"],
+  5: ["Алгебра", "Физика", "История", "ИЗО"],
+  6: ["Внеурочное занятие"],
+  0: ["Выходной день"]
 };
 
-let currentLang = 'ru';
+const dayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-// Proverka avtorizacii
+let selectedDate = new Date();
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (userDoc.exists()) {
-      renderDashboard(userDoc.data());
+      initDashboard(userDoc.data());
     }
   } else {
     window.location.href = "index.html";
   }
 });
 
-// Otrisovka paneli
-function renderDashboard(userData) {
+function initDashboard(userData) {
   const userNameEl = document.getElementById("userName");
   const userAvatarEl = document.getElementById("userAvatar");
-  const userRoleEl = document.getElementById("userRole");
-
+  
   if (userNameEl) userNameEl.innerText = userData.name;
   if (userAvatarEl && userData.name) {
     userAvatarEl.innerText = userData.name.split(" ").map(n => n[0]).join("").toUpperCase();
   }
-  if (userRoleEl) {
-    userRoleEl.innerText = getRoleName(userData.role);
-    userRoleEl.setAttribute("data-i18n", `role${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)}`);
+
+  renderCalendar();
+  renderScheduleForDate(selectedDate);
+  initBottomNav();
+
+  document.getElementById("prevWeek")?.addEventListener("click", () => {
+    selectedDate.setDate(selectedDate.getDate() - 7);
+    renderCalendar();
+    renderScheduleForDate(selectedDate);
+  });
+
+  document.getElementById("nextWeek")?.addEventListener("click", () => {
+    selectedDate.setDate(selectedDate.getDate() + 7);
+    renderCalendar();
+    renderScheduleForDate(selectedDate);
+  });
+
+  document.getElementById("btnToday")?.addEventListener("click", () => {
+    selectedDate = new Date();
+    renderCalendar();
+    renderScheduleForDate(selectedDate);
+  });
+}
+
+function renderCalendar() {
+  const container = document.getElementById("calendarDays");
+  const monthYearHeader = document.getElementById("currentMonthYear");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const startOfWeek = new Date(selectedDate);
+  const dayIndex = startOfWeek.getDay();
+  const diffToMon = startOfWeek.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
+  startOfWeek.setDate(diffToMon);
+
+  if (monthYearHeader) {
+    monthYearHeader.innerText = `${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
   }
 
-  // Zagruzhaem ocenki dlya uchenika
-  if (userData.role !== "teacher") {
-    loadStudentGrades(userData.email);
-    initBottomNav();
-  } else {
-    renderTeacherPanel();
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(startOfWeek);
+    day.setDate(startOfWeek.getDate() + i);
+
+    const isSelected = day.toDateString() === selectedDate.toDateString();
+    
+    const dayEl = document.createElement("div");
+    dayEl.className = `day-col ${isSelected ? "active" : ""}`;
+    dayEl.innerHTML = `
+      <span class="day-name">${dayNames[day.getDay()]}</span>
+      <span class="day-num">${day.getDate()}</span>
+    `;
+
+    dayEl.addEventListener("click", () => {
+      selectedDate = new Date(day);
+      renderCalendar();
+      renderScheduleForDate(selectedDate);
+    });
+
+    container.appendChild(dayEl);
   }
 }
 
-// Perekluchenie vkladok v Bottom Nav Bar
+function renderScheduleForDate(date) {
+  const scheduleContainer = document.getElementById("scheduleList");
+  const dateTitle = document.getElementById("selectedDateTitle");
+  if (!scheduleContainer) return;
+
+  const dayOfWeek = date.getDay();
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  if (dateTitle) dateTitle.innerText = `Расписание на ${date.toLocaleDateString('ru-RU', options)}`;
+
+  // Проверка начала учебного года (начиная с 1 сентября 2026)
+  const schoolStart = new Date(2026, 8, 1); 
+  const isVacation = date < schoolStart;
+
+  scheduleContainer.innerHTML = "";
+
+  if (isVacation) {
+    scheduleContainer.innerHTML = `
+      <div class="card vacation-card">
+        <h4>🌴 Летние каникулы</h4>
+        <p>Учеба начинается с 1 сентября 2026 г.</p>
+      </div>`;
+    return;
+  }
+
+  const lessons = defaultSchedule[dayOfWeek] || ["Уроков нет"];
+
+  lessons.forEach((lesson, index) => {
+    const card = document.createElement("div");
+    card.className = "card lesson-card";
+    card.innerHTML = `
+      <div class="lesson-num">${index + 1}</div>
+      <div class="lesson-info">
+        <h4 class="lesson-title active-term-text">${lesson}</h4>
+      </div>
+    `;
+    scheduleContainer.appendChild(card);
+  });
+}
+
 function initBottomNav() {
   const navItems = document.querySelectorAll('.bottom-nav .nav-item');
   const tabPages = document.querySelectorAll('.tab-page');
@@ -88,97 +154,6 @@ function initBottomNav() {
   });
 }
 
-// Zagruzka ocenok iz Firestore
-async function loadStudentGrades(email) {
-  const container = document.getElementById("gradesList");
-  if (!container) return;
-
-  try {
-    const q = query(collection(db, "grades"), where("studentEmail", "==", email));
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      container.innerHTML = `<p>${translations[currentLang].noGrades}</p>`;
-      return;
-    }
-
-    let html = "";
-    querySnapshot.forEach((doc) => {
-      const item = doc.data();
-      html += `
-        <div class="card">
-          <strong>${item.subject}:</strong> ${item.grade} 
-          <span style="float: right; opacity: 0.6;">${item.date}</span>
-        </div>`;
-    });
-
-    container.innerHTML = html;
-  } catch (error) {
-    console.error("Ошибка загрузки оценок:", error);
-    container.innerHTML = `<p>${translations[currentLang].errGrades}</p>`;
-  }
-}
-
-// Panel uchitelya
-function renderTeacherPanel() {
-  const content = document.querySelector('.app-content');
-  if (!content) return;
-
-  content.innerHTML = `
-    <section class="card">
-      <h3>Выставить оценку</h3>
-      <form id="gradeForm">
-        <input type="email" id="studentEmail" placeholder="Email ученика" required>
-        <input type="text" id="subject" placeholder="Предмет" required>
-        <input type="number" id="grade" placeholder="Оценка (1-5)" min="1" max="5" required>
-        <button type="submit" class="cal-pill" style="width: 100%; margin-top: 10px;">Сохранить</button>
-      </form>
-    </section>
-  `;
-
-  document.getElementById("gradeForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      await addDoc(collection(db, "grades"), {
-        studentEmail: document.getElementById("studentEmail").value,
-        subject: document.getElementById("subject").value,
-        grade: parseInt(document.getElementById("grade").value),
-        date: new Date().toLocaleDateString("ru-RU")
-      });
-      alert("Оценка успешно добавлена!");
-      e.target.reset();
-    } catch (err) {
-      alert("Ошибка при сохранении: " + err.message);
-    }
-  });
-}
-
-function getRoleName(role) {
-  const roles = { teacher: "Учитель", student: "Ученик", parent: "Родитель" };
-  return roles[role] || role;
-}
-
-// Smena yazyka
-document.getElementById("langSelect")?.addEventListener("change", (e) => {
-  currentLang = e.target.value;
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (translations[currentLang][key]) {
-      el.textContent = translations[currentLang][key];
-    }
-  });
-});
-
-// Smena temy
-document.getElementById("themeToggle")?.addEventListener("click", () => {
-  const body = document.body;
-  const isLight = body.classList.contains("light-theme");
-  body.classList.toggle("light-theme", !isLight);
-  body.classList.toggle("dark-theme", isLight);
-  document.getElementById("themeToggle").textContent = isLight ? "☀️" : "🌙";
-});
-
-// Vyhod
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "index.html");
 });
