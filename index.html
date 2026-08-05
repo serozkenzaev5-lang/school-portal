@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизация — Школьный Портал</title>
+    <title>Школьный Портал</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="auth-page">
@@ -15,7 +15,7 @@
             <p id="authSubtitle">Вход в личный кабинет</p>
         </div>
 
-        <!-- Форма Входа -->
+        <!-- Форма входа -->
         <form id="loginForm" class="auth-form">
             <div class="input-group">
                 <input type="email" id="loginEmail" placeholder="Email" required>
@@ -23,13 +23,15 @@
             <div class="input-group">
                 <input type="password" id="loginPassword" placeholder="Пароль" required>
             </div>
-            <button type="submit" class="btn-primary">Войти</button>
+            <!-- Текст внутри кнопки теперь строго прописан -->
+            <button type="submit" class="btn-primary" id="loginBtn">Войти</button>
+            
             <p class="auth-toggle">
                 Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a>
             </p>
         </form>
 
-        <!-- Форма Регистрации (скрыта по умолчанию) -->
+        <!-- Форма регистрации -->
         <form id="registerForm" class="auth-form hidden">
             <div class="input-group">
                 <input type="text" id="regName" placeholder="Имя и Фамилия" required>
@@ -48,7 +50,8 @@
                     <option value="parent">Родитель</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Зарегистрироваться</button>
+            <button type="submit" class="btn-primary" id="regBtn">Зарегистрироваться</button>
+            
             <p class="auth-toggle">
                 Уже есть аккаунт? <a href="#" id="showLogin">Войти</a>
             </p>
@@ -57,7 +60,6 @@
 
     <script type="module" src="js/auth.js"></script>
     <script>
-        // Простой переключатель между формами входа и регистрации
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const subtitle = document.getElementById('authSubtitle');
