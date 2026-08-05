@@ -8,7 +8,7 @@ const defaultSchedule = {
   3: ["Математика", "География", "Химия", "Литература"],
   4: ["Русский язык", "Обществознание", "Физкультура", "Английский язык"],
   5: ["Алгебра", "Физика", "История", "ИЗО"],
-  6: ["Внеурочное занятие"],
+  6: ["Выходной день"],
   0: ["Выходной день"]
 };
 
@@ -26,7 +26,6 @@ onAuthStateChanged(auth, async (user) => {
       initDashboard({ name: "Шероз Кенжаев", role: "Ученик" });
     }
   } else {
-    // Вход по умолчанию для тестирования
     initDashboard({ name: "Шероз Кенжаев", role: "Ученик" });
   }
 });
@@ -39,7 +38,7 @@ function initDashboard(userData) {
   renderScheduleForDate(selectedDate);
   initBottomNav();
 
-  // ПЕРЕКЛЮЧЕНИЕ ТОЛЬКО ПО КЛИКУ НА СТРЕЛКИ
+  // Переключение по стрелкам
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -52,7 +51,6 @@ function initDashboard(userData) {
     renderScheduleForDate(selectedDate);
   });
 
-  // Кнопка перехода на сегодняшнюю дату
   document.getElementById("btnToday")?.addEventListener("click", () => {
     selectedDate = new Date();
     renderCalendar();
@@ -67,7 +65,7 @@ function renderCalendar() {
 
   container.innerHTML = "";
 
-  // Определяем понедельник текущей недели
+  // Вычисляем понедельник недели
   const startOfWeek = new Date(selectedDate);
   const dayIndex = startOfWeek.getDay();
   const diffToMon = startOfWeek.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
@@ -82,15 +80,21 @@ function renderCalendar() {
     day.setDate(startOfWeek.getDate() + i);
 
     const isSelected = day.toDateString() === selectedDate.toDateString();
+    const dayOfWeek = day.getDay(); // 0 - Воскресенье, 6 - Суббота
+    const month = day.getMonth();   // 7 - Август (так как отсчет с 0)
+
+    // ЛОГИКА КРАСНОГО ЦВЕТА:
+    // 1. Если август (месяц === 7) -> красный
+    // 2. Если суббота (6) или воскресенье (0) -> красный
+    const isHolidayOrWeekend = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
 
     const dayEl = document.createElement("div");
     dayEl.className = `day-col ${isSelected ? "active" : ""}`;
     dayEl.innerHTML = `
       <span class="day-name">${dayNames[i]}</span>
-      <span class="day-num">${day.getDate()}</span>
+      <span class="day-num ${isHolidayOrWeekend ? "is-red" : ""}">${day.getDate()}</span>
     `;
 
-    // Выбор дня внутри отображаемой недели
     dayEl.addEventListener("click", () => {
       selectedDate = new Date(day);
       renderCalendar();
@@ -110,7 +114,7 @@ function renderScheduleForDate(date) {
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   if (dateTitle) dateTitle.innerText = `Расписание на ${date.toLocaleDateString('ru-RU', options)}`;
 
-  // До 1 сентября показывуется карточка каникул
+  // Каникулы в августе (до 1 сентября)
   const schoolStart = new Date(2026, 8, 1);
   const isVacation = date < schoolStart;
 
