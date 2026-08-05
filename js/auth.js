@@ -1,53 +1,52 @@
 import { auth, db } from './firebase-config.js';
 import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
   doc, 
-  setDoc, 
-  getDoc 
+  setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Регистрация нового пользователя
-export async function registerUser(email, password, role, name) {
+// Вход в аккаунт
+const loginForm = document.getElementById('loginForm');
+loginForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    alert("Ошибка входа: " + error.message);
+  }
+});
+
+// Регистрация аккаунта
+const registerForm = document.getElementById('registerForm');
+registerForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('regName').value;
+  const email = document.getElementById('regEmail').value;
+  const password = document.getElementById('regPassword').value;
+  const role = document.getElementById('regRole').value;
+
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Сохраняем роль и имя в базу данных Firestore
+    // Сохранение пользователя в базу
     await setDoc(doc(db, "users", user.uid), {
       name: name,
       email: email,
-      role: role,
-      createdAt: new Date()
+      role: role
     });
 
-    alert("Регистрация успешна!");
     window.location.href = "dashboard.html";
   } catch (error) {
-    console.error("Ошибка при регистрации:", error.message);
-    alert("Ошибка: " + error.message);
+    alert("Ошибка регистрации: " + error.message);
   }
-}
-
-// Вход существующего пользователя
-export async function loginUser(email, password) {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    // Получаем данные о роли из базы
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      // Сохраняем роль локально для быстрого доступа
-      localStorage.setItem("userRole", userData.role);
-      localStorage.setItem("userName", userData.name);
-      window.location.href = "dashboard.html";
-    }
-  } catch (error) {
-    console.error("Ошибка при входе:", error.message);
-    alert("Неверный логин или пароль");
-  }
-}
+});
