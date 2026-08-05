@@ -1,19 +1,19 @@
-// Импорт нужных модулей из Firebase CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Ваши ключи из консоли Firebase (https://console.firebase.google.com/)
+// Ваши ключи из консоли Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDQcXc5Pvl3MedAuOlpH2Dvr2VTlXwc-jM",
+  authDomain: "school-portal-ff938.firebaseapp.com",
+  projectId: "school-portal-ff938",
+  storageBucket: "school-portal-ff938.firebasestorage.app",
+  messagingSenderId: "569193226135",
+  appId: "1:569193226135:web:8f7b901a8f288d37e1eed2",
+  measurementId: "G-NVQG0DTXB3"
 };
 
-// Инициализация
+// Инициализация сервисов
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
