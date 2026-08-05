@@ -159,3 +159,58 @@ function getRoleName(role) {
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
   signOut(auth).then(() => window.location.href = "index.html");
 });
+// Переводы для страниц (RU, EN, UZ)
+const translations = {
+  ru: {
+    roleStudent: "Ученик",
+    august: "Август",
+    today: "Сегодня",
+    mon: "Пн", tue: "Вт", wed: "Ср", thu: "Чт", fri: "Пт", sat: "Сб", sun: "Вс",
+    navSchedule: "Расписание", navGrades: "Оценки", navHw: "Задания",
+    math: "Математика", rus: "Русский язык",
+    gradesTitle: "Дневник успеваемости", hwTitle: "Домашнее задание"
+  },
+  en: {
+    roleStudent: "Student",
+    august: "August",
+    today: "Today",
+    mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun",
+    navSchedule: "Schedule", navGrades: "Grades", navHw: "Tasks",
+    math: "Mathematics", rus: "Russian Language",
+    gradesTitle: "Gradebook", hwTitle: "Homework"
+  },
+  uz: {
+    roleStudent: "O'quvchi",
+    august: "Avgust",
+    today: "Bugun",
+    mon: "Du", tue: "Se", wed: "Ch", thu: "Pa", fri: "Ju", sat: "Sh", sun: "Yak",
+    navSchedule: "Dars jadvali", navGrades: "Boholar", navHw: "Vazifalar",
+    math: "Matematika", rus: "Rus tili",
+    gradesTitle: "Baholar kundaligi", hwTitle: "Uy vazifasi"
+  }
+};
+
+// Смена языка
+const langSelect = document.getElementById("langSelect");
+langSelect?.addEventListener("change", (e) => {
+  const lang = e.target.value;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (translations[lang][key]) {
+      el.textContent = translations[lang][key];
+    }
+  });
+});
+
+// Смена темной/светлой темы
+const themeBtn = document.getElementById("themeToggle");
+themeBtn?.addEventListener("click", () => {
+  const body = document.body;
+  if (body.classList.contains("light-theme")) {
+    body.classList.replace("light-theme", "dark-theme");
+    themeBtn.textContent = "☀️";
+  } else {
+    body.classList.replace("dark-theme", "light-theme");
+    themeBtn.textContent = "🌙";
+  }
+});
