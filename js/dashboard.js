@@ -27,7 +27,7 @@ onAuthStateChanged(auth, async (user) => {
       currentUserData = { id: user.uid, name: "Пользователь", role: "student" };
     }
   } else {
-    currentUserData = { id: "demo", name: "Шероз Кенжаев", role: "teacher" };
+    currentUserData = { id: "demo", name: "Учитель", role: "teacher" };
   }
   initDashboard();
 });
@@ -46,6 +46,7 @@ function initDashboard() {
   loadGrades();
   loadTasks();
 
+  // Переключение по стрелкам
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -89,6 +90,7 @@ function renderCalendar() {
     const dayOfWeek = day.getDay();
     const month = day.getMonth();
 
+    // Красный цвет в августе или на выходных (Сб, Вс)
     const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
 
     const dayEl = document.createElement("div");
@@ -146,7 +148,7 @@ function renderScheduleForDate(date) {
   });
 }
 
-// ---------------- ПОДДЕРЖКА УЧИТЕЛЯ И ОЦЕНОК ----------------
+// ---------------- ПОДДЕРЖКА УЧИТЕЛЯ ----------------
 
 function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
@@ -173,7 +175,7 @@ async function loadStudentsList() {
       select.appendChild(opt);
     });
   } catch (err) {
-    console.log("Демо-режим выбора учеников");
+    console.log("Загрузка списка учеников");
   }
 }
 
@@ -198,7 +200,7 @@ document.getElementById('addGradeForm')?.addEventListener('submit', async (e) =>
     document.getElementById('addGradeForm').reset();
     loadGrades();
   } catch (err) {
-    alert("Ошибка сохранения оценки.");
+    alert("Ошибка при сохранении отметки.");
   }
 });
 
@@ -220,7 +222,7 @@ document.getElementById('addTaskForm')?.addEventListener('submit', async (e) => 
     document.getElementById('addTaskForm').reset();
     loadTasks();
   } catch (err) {
-    alert("Ошибка добавления ДЗ.");
+    alert("Ошибка при добавлении задания.");
   }
 });
 
@@ -238,7 +240,7 @@ async function loadGrades() {
 
     querySnapshot.forEach((docSnap) => {
       const g = docSnap.data();
-      let badgeClass = "grade-num";
+      let badgeClass = "";
       if (g.value === "Б") badgeClass = "status-b";
       if (g.value === "П") badgeClass = "status-p";
 
@@ -255,7 +257,7 @@ async function loadGrades() {
       container.appendChild(card);
     });
   } catch (err) {
-    container.innerHTML = `<div class="card"><p>Список оценок пуст.</p></div>`;
+    container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
   }
 }
 
@@ -283,7 +285,7 @@ async function loadTasks() {
       container.appendChild(card);
     });
   } catch (err) {
-    container.innerHTML = `<div class="card"><p>Список заданий пуст.</p></div>`;
+    container.innerHTML = `<div class="card"><p>Заданий пока нет.</p></div>`;
   }
 }
 
