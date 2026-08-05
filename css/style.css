@@ -479,3 +479,8 @@ body::after {
 .nav-arrow-btn:active {
     transform: scale(0.92);
 }
+/* Красные числа для выходных и августа */
+.day-num.is-red {
+    color: #e11d48 !important; /* Яркий красный цвет */
+    font-weight: 600;
+}
