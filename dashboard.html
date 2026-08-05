@@ -7,88 +7,119 @@
     <link rel="shortcut icon" href="#">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="light-theme">
     <div class="app-layout">
-        <!-- Шапка с профилем -->
+        <!-- Шапка сайта -->
         <header class="app-header">
             <div class="user-profile">
-                <div class="avatar" id="userAvatar">УК</div>
+                <div class="avatar" id="userAvatar">ШК</div>
                 <div class="user-details">
                     <h2 id="userName">Загрузка...</h2>
-                    <span id="userRole" class="role-badge">Ученик</span>
+                    <span id="userRole" class="role-badge" data-i18n="roleStudent">Ученик</span>
                 </div>
             </div>
-            <button id="logoutBtn" class="icon-btn" title="Выйти">🚪</button>
+            
+            <!-- Настройки: Тема и Язык -->
+            <div class="header-actions">
+                <select id="langSelect" class="lang-dropdown">
+                    <option value="ru">RU</option>
+                    <option value="en">EN</option>
+                    <option value="uz">UZ</option>
+                </select>
+                <button id="themeToggle" class="icon-btn">🌙</button>
+                <button id="logoutBtn" class="icon-btn" title="Выйти">🚪</button>
+            </div>
         </header>
 
-        <!-- Календарная плашка -->
-        <div class="calendar-bar">
+        <!-- Календарная панель (в точности как на скрине) -->
+        <div class="calendar-section">
             <div class="calendar-days">
-                <div class="day-item"><span>Пн</span><strong>3</strong></div>
-                <div class="day-item"><span>Вт</span><strong>4</strong></div>
-                <div class="day-item active"><span>Ср</span><strong>5</strong></div>
-                <div class="day-item"><span>Чт</span><strong>6</strong></div>
-                <div class="day-item"><span>Пт</span><strong>7</strong></div>
-                <div class="day-item weekend"><span>Сб</span><strong>8</strong></div>
-                <div class="day-item weekend"><span>Вс</span><strong>9</strong></div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="mon">Пн</span>
+                    <span class="day-num is-holiday">3</span>
+                </div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="tue">Вт</span>
+                    <span class="day-num is-holiday">4</span>
+                </div>
+                <div class="day-col active">
+                    <span class="day-name" data-i18n="wed">Ср</span>
+                    <span class="day-num">5</span>
+                </div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="thu">Чт</span>
+                    <span class="day-num is-holiday">6</span>
+                </div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="fri">Пт</span>
+                    <span class="day-num is-holiday">7</span>
+                </div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="sat">Сб</span>
+                    <span class="day-num is-holiday">8</span>
+                </div>
+                <div class="day-col">
+                    <span class="day-name" data-i18n="sun">Вс</span>
+                    <span class="day-num is-holiday">9</span>
+                </div>
+            </div>
+
+            <div class="calendar-controls">
+                <div class="btn-group">
+                    <button class="cal-pill" id="monthBtn" data-i18n="august">Август</button>
+                    <button class="cal-pill" id="todayBtn" data-i18n="today">Сегодня</button>
+                </div>
+                <button class="cal-pill icon-only">•••</button>
             </div>
         </div>
 
-        <!-- Контент вкладок -->
+        <!-- Контент страниц -->
         <main class="app-content">
             <section id="tab-schedule" class="tab-page active">
                 <div class="card-list">
                     <div class="card lesson-card">
                         <span class="lesson-num">1</span>
                         <div class="lesson-info">
-                            <h4>Математика</h4>
-                            <p>Кабинет 302 • 08:30 - 09:15</p>
+                            <h4 data-i18n="math">Математика</h4>
+                            <p>08:30 - 09:15</p>
                         </div>
                     </div>
                     <div class="card lesson-card">
                         <span class="lesson-num">2</span>
                         <div class="lesson-info">
-                            <h4>Русский язык</h4>
-                            <p>Кабинет 210 • 09:25 - 10:10</p>
-                        </div>
-                    </div>
-                    <div class="card lesson-card">
-                        <span class="lesson-num">3</span>
-                        <div class="lesson-info">
-                            <h4>Физика</h4>
-                            <p>Кабинет 105 • 10:30 - 11:15</p>
+                            <h4 data-i18n="rus">Русский язык</h4>
+                            <p>09:25 - 10:10</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <section id="tab-grades" class="tab-page hidden">
-                <h3>Дневник успеваемости</h3>
+                <h3 data-i18n="gradesTitle">Дневник успеваемости</h3>
                 <div id="gradesList" class="card-list">Загрузка...</div>
             </section>
 
             <section id="tab-homework" class="tab-page hidden">
-                <h3>Домашние задания</h3>
+                <h3 data-i18n="hwTitle">Домашнее задание</h3>
                 <div class="card-list">
-                    <div class="card"><strong>Математика:</strong> №124, №125</div>
-                    <div class="card"><strong>Физика:</strong> Параграф 12, выучить формулы</div>
+                    <div class="card"><strong data-i18n="math">Математика</strong>: №124, №125</div>
                 </div>
             </section>
         </main>
 
-        <!-- Нижнее адаптивное меню (Bottom Navigation) -->
+        <!-- Нижнее меню -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-tab="schedule">
                 <span class="nav-icon">📅</span>
-                <span class="nav-label">Расписание</span>
+                <span class="nav-label" data-i18n="navSchedule">Расписание</span>
             </button>
             <button class="nav-item" data-tab="grades">
                 <span class="nav-icon">⭐</span>
-                <span class="nav-label">Оценки</span>
+                <span class="nav-label" data-i18n="navGrades">Оценки</span>
             </button>
             <button class="nav-item" data-tab="homework">
                 <span class="nav-icon">📝</span>
-                <span class="nav-label">Задания</span>
+                <span class="nav-label" data-i18n="navHw">Задания</span>
             </button>
         </nav>
     </div>
