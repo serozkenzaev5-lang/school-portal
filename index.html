@@ -1,43 +1,39 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный Портал</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
 <body>
-
+    <!-- Добавляем auth-container -->
     <div class="auth-container">
-        <!-- ФОРМА ВХОДА -->
-        <form id="loginForm" class="card">
-            <h2>Вход в портал</h2>
-            <input type="email" id="loginEmail" placeholder="Email" required>
-            <input type="password" id="loginPassword" placeholder="Пароль" required>
-            <button type="submit">Войти</button>
-            <p>Еще нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
-        </form>
+        <!-- Оборачиваем форму входа в auth-box -->
+        <div id="login-form-box" class="auth-box">
+            <h2>Школьный Портал</h2>
+            <p>Вход в личный кабинет</p>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                <button type="submit" class="submit-btn">Войти</button>
+            </form>
+            <p>Нет аккаунта? <a id="showRegister">Зарегистрироваться</a></p>
+        </div>
 
-        <!-- ФОРМА РЕГИСТРАЦИИ (скрыта по умолчанию) -->
-        <form id="registerForm" class="card hidden">
+        <!-- Оборачиваем форму регистрации в auth-box и добавляем hidden -->
+        <div id="register-form-box" class="auth-box hidden">
             <h2>Регистрация</h2>
-            <input type="text" id="regName" placeholder="ФИО / Имя" required>
-            <input type="email" id="regEmail" placeholder="Email" required>
-            <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
-            
-            <label for="regRole">Выберите роль:</label>
-            <select id="regRole" required>
-                <option value="student">Ученик</option>
-                <option value="teacher">Учитель</option>
-                <option value="parent">Родитель</option>
-            </select>
-
-            <button type="submit">Зарегистрироваться</button>
-            <p>Уже есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
-        </form>
+            <p>Создайте новый аккаунт</p>
+            <form id="registerForm">
+                <input type="text" id="registerName" placeholder="Имя и Фамилия" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 симв.)" required>
+                <select id="registerRole" required>
+                    <option value="" disabled selected>Выберите вашу роль</option>
+                    <option value="student">Ученик</option>
+                    <option value="teacher">Учитель</option>
+                    <option value="parent">Родитель</option>
+                </select>
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+            </form>
+            <p>Уже есть аккаунт? <a id="showLogin">Войти</a></p>
+        </div>
     </div>
 
-    <!-- ВАЖНО: тип module позволяет использовать import/export в JS -->
+    <!-- Твои скрипты (обязательно с type="module") -->
+    <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
-</html>
