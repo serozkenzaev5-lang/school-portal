@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Школьный Портал</title>
-    <!-- Заглушка для отмены ошибки 404 favicon.ico -->
-    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <!-- Прямое глушение ошибки favicon через base64 -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="auth-page">
@@ -74,8 +74,8 @@
 
         document.getElementById('showLogin').addEventListener('click', (e) => {
             e.preventDefault();
-            registerForm.classList.add('hidden');
-            loginForm.classList.remove('hidden');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
             subtitle.textContent = 'Вход в личный кабинет';
         });
     </script>
