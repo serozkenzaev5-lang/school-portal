@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет — Школьный Портал</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Школьный Портал - Личный Кабинет</title>
+    <!-- Заглушка для favicon, убирающая ошибку 404 -->
+    <link rel="shortcut icon" href="#">
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="top-bar">
-        <span id="userInfo">Загрузка...</span>
-        <button id="logoutBtn">Выйти</button>
+    <header>
+        <div class="header-container">
+            <h2>Школьный Портал</h2>
+            <div class="user-control">
+                <span id="userInfo">Загрузка пользователя...</span>
+                <button id="logoutBtn">Выйти</button>
+            </div>
+        </div>
     </header>
 
     <main class="container">
-        <div id="dashboardContent">
-            <!-- Сюда JavaScript подставит нужный функционал -->
-        </div>
+        <section id="dashboardContent">
+            <!-- Сюда динамически подгружается контент (дневник или форма учителя) -->
+        </section>
     </main>
 
-    <script type="module" src="js/dashboard.js"></script>
+    <!-- Подключение основного скрипта панели управления -->
+    <script type="module" src="dashboard.js"></script>
 </body>
 </html>
