@@ -1,4 +1,3 @@
-// Переменные состояния
 const defaultSchedule = {
   1: ["Математика", "Русский язык", "История", "Физика"],
   2: ["Английский язык", "Информатика", "Геометрия", "Биология"],
@@ -14,13 +13,12 @@ const monthNames = ["Январь", "Февраль", "Март", "Апрель"
 
 let selectedDate = new Date();
 let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
-let isInitialized = false;
 
-// Безопасный запуск отрисовки интерфейса
-function startApp() {
-  if (isInitialized) return;
-  isInitialized = true;
+document.addEventListener("DOMContentLoaded", () => {
+  initDashboard();
+});
 
+function initDashboard() {
   const userNameEl = document.getElementById("userName");
   const userRoleEl = document.getElementById("userRole");
 
@@ -34,7 +32,6 @@ function startApp() {
   loadGrades();
   loadTasks();
 
-  // Навешивание событий на кнопки
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -54,33 +51,6 @@ function startApp() {
   });
 }
 
-// Попытка динамического импорта Firebase
-async function initFirebase() {
-  try {
-    const { auth, db } = await import('./firebase-config.js');
-    const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
-    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            currentUserData = { id: user.uid, ...userDoc.data() };
-          }
-        } catch (e) {
-          console.warn("Ошибка получения данных пользователя Firebase");
-        }
-      }
-      startApp();
-    });
-  } catch (err) {
-    console.warn("Firebase недоступен, работа в локальном режиме:", err);
-    startApp();
-  }
-}
-
-// Отрисовка календаря
 function renderCalendar() {
   const container = document.getElementById("calendarDays");
   const monthYearHeader = document.getElementById("currentMonthYear");
@@ -123,7 +93,6 @@ function renderCalendar() {
   }
 }
 
-// Отрисовка расписания
 function renderScheduleForDate(date) {
   const scheduleContainer = document.getElementById("scheduleList");
   const dateTitle = document.getElementById("selectedDateTitle");
@@ -164,9 +133,13 @@ function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
     document.getElementById('teacherGradePanel')?.classList.remove('hidden');
     document.getElementById('teacherTaskPanel')?.classList.remove('hidden');
+    
     const select = document.getElementById('gradeStudentSelect');
-    if (select && select.children.length <= 1) {
-      select.innerHTML += `<option value="st-1">Алексей Иванов</option><option value="st-2">Мария Петрова</option>`;
+    if (select && select.options.length <= 1) {
+      select.innerHTML += `
+        <option value="st-1">Алексей Иванов</option>
+        <option value="st-2">Мария Петрова</option>
+      `;
     }
   }
 }
@@ -200,10 +173,3 @@ function initBottomNav() {
     });
   });
 }
-
-// Старт инициализации
-document.addEventListener("DOMContentLoaded", () => {
-  initFirebase();
-  // Принудительный запуск через 300 мс, если импорт застрял
-  setTimeout(startApp, 300);
-});
