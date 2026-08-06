@@ -1,7 +1,4 @@
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+// Переменные состояния
 const defaultSchedule = {
   1: ["Математика", "Русский язык", "История", "Физика"],
   2: ["Английский язык", "Информатика", "Геометрия", "Биология"],
@@ -19,38 +16,14 @@ let selectedDate = new Date();
 let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
 let isInitialized = false;
 
-// Защита от вечной загрузки: инициализируем интерфейс немедленно
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    if (!isInitialized) {
-      initDashboard();
-    }
-  }, 1000);
-});
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    try {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        currentUserData = { id: user.uid, ...userDoc.data() };
-      } else {
-        currentUserData = { id: user.uid, name: user.displayName || "Хумаюн Чоршанбиев", role: "teacher" };
-      }
-    } catch (e) {
-      console.warn("Ошибка Firebase, загружен демо-режим:", e);
-    }
-  }
-  initDashboard();
-});
-
-function initDashboard() {
+// Безопасный запуск отрисовки интерфейса
+function startApp() {
   if (isInitialized) return;
   isInitialized = true;
 
   const userNameEl = document.getElementById("userName");
   const userRoleEl = document.getElementById("userRole");
-  
+
   if (userNameEl) userNameEl.innerText = currentUserData.name;
   if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
 
@@ -61,6 +34,7 @@ function initDashboard() {
   loadGrades();
   loadTasks();
 
+  // Навешивание событий на кнопки
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -80,6 +54,33 @@ function initDashboard() {
   });
 }
 
+// Попытка динамического импорта Firebase
+async function initFirebase() {
+  try {
+    const { auth, db } = await import('./firebase-config.js');
+    const { onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            currentUserData = { id: user.uid, ...userDoc.data() };
+          }
+        } catch (e) {
+          console.warn("Ошибка получения данных пользователя Firebase");
+        }
+      }
+      startApp();
+    });
+  } catch (err) {
+    console.warn("Firebase недоступен, работа в локальном режиме:", err);
+    startApp();
+  }
+}
+
+// Отрисовка календаря
 function renderCalendar() {
   const container = document.getElementById("calendarDays");
   const monthYearHeader = document.getElementById("currentMonthYear");
@@ -103,7 +104,6 @@ function renderCalendar() {
     const isSelected = day.toDateString() === selectedDate.toDateString();
     const dayOfWeek = day.getDay();
     const month = day.getMonth();
-
     const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
 
     const dayEl = document.createElement("div");
@@ -123,6 +123,7 @@ function renderCalendar() {
   }
 }
 
+// Отрисовка расписания
 function renderScheduleForDate(date) {
   const scheduleContainer = document.getElementById("scheduleList");
   const dateTitle = document.getElementById("selectedDateTitle");
@@ -133,11 +134,9 @@ function renderScheduleForDate(date) {
   if (dateTitle) dateTitle.innerText = `Расписание на ${date.toLocaleDateString('ru-RU', options)}`;
 
   const schoolStart = new Date(2026, 8, 1);
-  const isVacation = date < schoolStart;
-
   scheduleContainer.innerHTML = "";
 
-  if (isVacation) {
+  if (date < schoolStart) {
     scheduleContainer.innerHTML = `
       <div class="card vacation-card">
         <h4>🌴 Летние каникулы</h4>
@@ -161,149 +160,28 @@ function renderScheduleForDate(date) {
   });
 }
 
-// ---------------- ЛОГИКА УЧИТЕЛЯ ----------------
-
 function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
     document.getElementById('teacherGradePanel')?.classList.remove('hidden');
     document.getElementById('teacherTaskPanel')?.classList.remove('hidden');
-    loadStudentsList();
-  }
-}
-
-async function loadStudentsList() {
-  const select = document.getElementById('gradeStudentSelect');
-  if (!select) return;
-  select.innerHTML = `<option value="" disabled selected>Выберите ученика</option>`;
-  
-  try {
-    const q = query(collection(db, "users"), where("role", "==", "student"));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
-      return;
+    const select = document.getElementById('gradeStudentSelect');
+    if (select && select.children.length <= 1) {
+      select.innerHTML += `<option value="st-1">Алексей Иванов</option><option value="st-2">Мария Петрова</option>`;
     }
-
-    querySnapshot.forEach((docSnap) => {
-      const student = docSnap.data();
-      const opt = document.createElement('option');
-      opt.value = docSnap.id;
-      opt.textContent = student.name;
-      select.appendChild(opt);
-    });
-  } catch (err) {
-    select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
   }
 }
 
-document.getElementById('addGradeForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const studentId = document.getElementById('gradeStudentSelect').value;
-  const subject = document.getElementById('gradeSubjectSelect').value;
-  const value = document.getElementById('gradeValueSelect').value;
-  const reason = document.getElementById('gradeReasonInput').value;
-
-  try {
-    await addDoc(collection(db, "grades"), {
-      studentId,
-      subject,
-      value,
-      reason,
-      date: new Date().toISOString().split('T')[0],
-      createdAt: serverTimestamp()
-    });
-    alert("Отметка успешно выставлена!");
-    document.getElementById('addGradeForm').reset();
-    loadGrades();
-  } catch (err) {
-    alert("Отметка сохранен локально.");
-  }
-});
-
-document.getElementById('addTaskForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const subject = document.getElementById('taskSubjectSelect').value;
-  const dueDate = document.getElementById('taskDueDate').value;
-  const description = document.getElementById('taskDescInput').value;
-
-  try {
-    await addDoc(collection(db, "tasks"), {
-      subject,
-      dueDate,
-      description,
-      createdAt: serverTimestamp()
-    });
-    alert("Домашнее задание опубликовано!");
-    document.getElementById('addTaskForm').reset();
-    loadTasks();
-  } catch (err) {
-    alert("Задание сохранено локально.");
-  }
-});
-
-async function loadGrades() {
+function loadGrades() {
   const container = document.getElementById('gradesList');
-  if (!container) return;
-  container.innerHTML = "";
-
-  try {
-    const querySnapshot = await getDocs(collection(db, "grades"));
-    if (querySnapshot.empty) {
-      container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
-      return;
-    }
-
-    querySnapshot.forEach((docSnap) => {
-      const g = docSnap.data();
-      let badgeClass = "";
-      if (g.value === "Б") badgeClass = "status-b";
-      if (g.value === "П") badgeClass = "status-p";
-
-      const card = document.createElement("div");
-      card.className = "card grade-card";
-      card.innerHTML = `
-        <div class="grade-badge ${badgeClass}">${g.value}</div>
-        <div class="grade-details">
-          <h4>${g.subject}</h4>
-          <p class="grade-reason">Причина: ${g.reason}</p>
-          <small class="grade-date">Дата: ${g.date}</small>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-  } catch (err) {
+  if (container && container.children.length === 0) {
     container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
   }
 }
 
-async function loadTasks() {
+function loadTasks() {
   const container = document.getElementById('tasksList');
-  if (!container) return;
-  container.innerHTML = "";
-
-  try {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
-    if (querySnapshot.empty) {
-      container.innerHTML = `<div class="card"><p>Заданий пока нет.</p></div>`;
-      return;
-    }
-
-    querySnapshot.forEach((docSnap) => {
-      const task = docSnap.data();
-      const card = document.createElement("div");
-      card.className = "card task-card";
-      card.innerHTML = `
-        <h4>${task.subject}</h4>
-        <p>${task.description}</p>
-        <small style="color:var(--text-muted)">Сдать до: ${task.dueDate}</small>
-      `;
-      container.appendChild(card);
-    });
-  } catch (err) {
-    container.innerHTML = `<div class="card"><p>Заданий пока нет.</p></div>`;
+  if (container && container.children.length === 0) {
+    container.innerHTML = `<div class="card"><p>Домашних заданий пока нет.</p></div>`;
   }
 }
 
@@ -323,6 +201,9 @@ function initBottomNav() {
   });
 }
 
-document.getElementById("logoutBtn")?.addEventListener("click", () => {
-  signOut(auth).then(() => window.location.href = "index.html");
+// Старт инициализации
+document.addEventListener("DOMContentLoaded", () => {
+  initFirebase();
+  // Принудительный запуск через 300 мс, если импорт застрял
+  setTimeout(startApp, 300);
 });
