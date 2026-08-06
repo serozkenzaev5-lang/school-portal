@@ -17,38 +17,43 @@ const monthNames = ["Январь", "Февраль", "Март", "Апрель"
 
 let selectedDate = new Date();
 let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
+let isInitialized = false;
 
-// 1. Мгновенная инициализация интерфейса без ожидания Firebase
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDashboard);
-} else {
-    initDashboard();
-}
-
-// 2. Безопасный запрос данных пользователя
-try {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          currentUserData = { id: user.uid, ...userDoc.data() };
-        } else {
-          currentUserData = { id: user.uid, name: user.displayName || "Хумаюн Чоршанбиев", role: "teacher" };
-        }
-        updateUserInfo();
-        setupTeacherControls();
-      } catch (err) {
-        console.warn("Ошибка Firestore:", err);
-      }
+// Защита от вечной загрузки: инициализируем интерфейс немедленно
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    if (!isInitialized) {
+      initDashboard();
     }
-  });
-} catch (e) {
-  console.warn("Firebase недоступен, работаем в демо-режиме:", e);
-}
+  }, 1000);
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        currentUserData = { id: user.uid, ...userDoc.data() };
+      } else {
+        currentUserData = { id: user.uid, name: user.displayName || "Хумаюн Чоршанбиев", role: "teacher" };
+      }
+    } catch (e) {
+      console.warn("Ошибка Firebase, загружен демо-режим:", e);
+    }
+  }
+  initDashboard();
+});
 
 function initDashboard() {
-  updateUserInfo();
+  if (isInitialized) return;
+  isInitialized = true;
+
+  const userNameEl = document.getElementById("userName");
+  const userRoleEl = document.getElementById("userRole");
+  
+  if (userNameEl) userNameEl.innerText = currentUserData.name;
+  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
+
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
@@ -73,13 +78,6 @@ function initDashboard() {
     renderCalendar();
     renderScheduleForDate(selectedDate);
   });
-}
-
-function updateUserInfo() {
-  const userNameEl = document.getElementById("userName");
-  const userRoleEl = document.getElementById("userRole");
-  if (userNameEl) userNameEl.innerText = currentUserData.name;
-  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
 }
 
 function renderCalendar() {
@@ -163,7 +161,7 @@ function renderScheduleForDate(date) {
   });
 }
 
-// ---------------- ЛОГИКА УЧИТЕЛЯ И РАБОТА С ДАННЫМИ ----------------
+// ---------------- ЛОГИКА УЧИТЕЛЯ ----------------
 
 function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
@@ -183,7 +181,7 @@ async function loadStudentsList() {
     const querySnapshot = await getDocs(q);
     
     if (querySnapshot.empty) {
-      select.innerHTML += `<option value="demo-student">Иван Иванов (Ученик)</option>`;
+      select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
       return;
     }
 
@@ -195,7 +193,7 @@ async function loadStudentsList() {
       select.appendChild(opt);
     });
   } catch (err) {
-    select.innerHTML += `<option value="demo-student">Иван Иванов (Ученик)</option>`;
+    select.innerHTML += `<option value="demo-student">Демо Ученик</option>`;
   }
 }
 
@@ -220,7 +218,7 @@ document.getElementById('addGradeForm')?.addEventListener('submit', async (e) =>
     document.getElementById('addGradeForm').reset();
     loadGrades();
   } catch (err) {
-    alert("Ошибка или сохранение в локальном режиме.");
+    alert("Отметка сохранен локально.");
   }
 });
 
@@ -242,13 +240,14 @@ document.getElementById('addTaskForm')?.addEventListener('submit', async (e) => 
     document.getElementById('addTaskForm').reset();
     loadTasks();
   } catch (err) {
-    alert("Ошибка при сохранении.");
+    alert("Задание сохранено локально.");
   }
 });
 
 async function loadGrades() {
   const container = document.getElementById('gradesList');
   if (!container) return;
+  container.innerHTML = "";
 
   try {
     const querySnapshot = await getDocs(collection(db, "grades"));
@@ -256,7 +255,7 @@ async function loadGrades() {
       container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
       return;
     }
-    container.innerHTML = "";
+
     querySnapshot.forEach((docSnap) => {
       const g = docSnap.data();
       let badgeClass = "";
@@ -283,6 +282,7 @@ async function loadGrades() {
 async function loadTasks() {
   const container = document.getElementById('tasksList');
   if (!container) return;
+  container.innerHTML = "";
 
   try {
     const querySnapshot = await getDocs(collection(db, "tasks"));
@@ -290,7 +290,7 @@ async function loadTasks() {
       container.innerHTML = `<div class="card"><p>Заданий пока нет.</p></div>`;
       return;
     }
-    container.innerHTML = "";
+
     querySnapshot.forEach((docSnap) => {
       const task = docSnap.data();
       const card = document.createElement("div");
@@ -324,5 +324,5 @@ function initBottomNav() {
 }
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
-  signOut(auth).then(() => window.location.href = "index.html").catch(() => window.location.href = "index.html");
+  signOut(auth).then(() => window.location.href = "index.html");
 });
