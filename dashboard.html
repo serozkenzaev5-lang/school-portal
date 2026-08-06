@@ -44,11 +44,13 @@
         </section>
 
         <main class="app-content">
+            <!-- Вкладка: Расписание -->
             <div id="tab-schedule" class="tab-page">
                 <h3 id="selectedDateTitle" style="margin-bottom: 16px;">Расписание</h3>
                 <div id="scheduleList" class="card-list"></div>
             </div>
 
+            <!-- Вкладка: Успеваемость -->
             <div id="tab-grades" class="tab-page hidden">
                 <h3 style="margin-bottom: 16px;">Успеваемость и отметки</h3>
                 
@@ -81,6 +83,7 @@
                 <div id="gradesList" class="card-list"></div>
             </div>
 
+            <!-- Вкладка: Задания -->
             <div id="tab-tasks" class="tab-page hidden">
                 <h3 style="margin-bottom: 16px;">Домашние задания</h3>
 
@@ -104,7 +107,24 @@
             </div>
         </main>
 
+        <!-- Нижнее меню навигации -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-tab="schedule">
                 <span>📅</span>
-                <small>Расписание
+                <small>Расписание</small>
+            </button>
+            <button class="nav-item" data-tab="grades">
+                <span>📊</span>
+                <small>Отметки</small>
+            </button>
+            <button class="nav-item" data-tab="tasks">
+                <span>📝</span>
+                <small>Задания</small>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Подключение JS-файла -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
