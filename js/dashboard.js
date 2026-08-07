@@ -129,17 +129,43 @@ function renderScheduleForDate(date) {
   });
 }
 
-function setupTeacherControls() {
+async function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
     document.getElementById('teacherGradePanel')?.classList.remove('hidden');
     document.getElementById('teacherTaskPanel')?.classList.remove('hidden');
     
     const select = document.getElementById('gradeStudentSelect');
-    if (select && select.options.length <= 1) {
-      select.innerHTML += `
-        <option value="st-1">Алексей Иванов</option>
-        <option value="st-2">Мария Петрова</option>
-      `;
+    if (!select) return;
+
+    select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
+
+    try {
+      if (typeof db !== 'undefined') {
+        const snapshot = await db.collection("users").where("role", "==", "student").get();
+        select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
+
+        if (snapshot.empty) {
+          select.innerHTML += '<option value="" disabled>Ученики не найдены</option>';
+          return;
+        }
+
+        snapshot.forEach((doc) => {
+          const student = doc.data();
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = student.name || student.fullName || "Ученик";
+          select.appendChild(option);
+        });
+      } else {
+        select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
+        select.innerHTML += `
+          <option value="st-1">Алексей Иванов</option>
+          <option value="st-2">Мария Петрова</option>
+        `;
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки учеников из Firebase:", error);
+      select.innerHTML = '<option value="" disabled selected>Ошибка загрузки списка</option>';
     }
   }
 }
