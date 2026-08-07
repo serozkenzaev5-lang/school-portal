@@ -145,7 +145,7 @@ async function setupTeacherControls() {
         select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
 
         if (snapshot.empty) {
-          select.innerHTML += '<option value="" disabled>Ученики не найдены</option>';
+          select.innerHTML += '<option value="" disabled>Ученики в базе не найдены</option>';
           return;
         }
 
@@ -157,11 +157,7 @@ async function setupTeacherControls() {
           select.appendChild(option);
         });
       } else {
-        select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
-        select.innerHTML += `
-          <option value="st-1">Алексей Иванов</option>
-          <option value="st-2">Мария Петрова</option>
-        `;
+        select.innerHTML = '<option value="" disabled selected>Ошибка: Firebase не подключен</option>';
       }
     } catch (error) {
       console.error("Ошибка загрузки учеников из Firebase:", error);
