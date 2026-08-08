@@ -58,7 +58,7 @@
                     <h4>Выставить оценку / отметку</h4>
                     <form id="addGradeForm" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
                         <select id="gradeStudentSelect" required class="input-select">
-                            <option value="" disabled selected>Выберите ученика</option>
+                            <option value="" disabled selected>Загрузка учеников...</option>
                         </select>
                         <select id="gradeSubjectSelect" required class="input-select">
                             <option value="Математика">Математика</option>
@@ -124,7 +124,14 @@
         </nav>
     </div>
 
-    <!-- Подключение JS-файла -->
+    <!-- Firebase SDK (Подключается строго перед dashboard.js) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Конфигурация Firebase -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Основная логика -->
     <script src="js/dashboard.js"></script>
 </body>
 </html>
