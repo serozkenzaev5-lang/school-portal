@@ -579,3 +579,56 @@ body::after {
 .hidden {
     display: none !important;
 }
+/* Кнопка смены темы на странице входа */
+.auth-container {
+    position: relative;
+}
+
+.theme-toggle-btn {
+    position: absolute;
+    top: -45px;
+    right: 20px;
+    background: transparent;
+    border: 1px solid #334155;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+}
+
+/* Светлая тема для страницы авторизации */
+body.light-theme.auth-page {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+body.light-theme .auth-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .auth-header h2 {
+    color: #0f172a;
+}
+
+body.light-theme .auth-header p,
+body.light-theme .form-group label,
+body.light-theme .auth-toggle,
+body.light-theme .reset-info {
+    color: #475569;
+}
+
+body.light-theme .input-text,
+body.light-theme .input-select {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+body.light-theme .theme-toggle-btn {
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
