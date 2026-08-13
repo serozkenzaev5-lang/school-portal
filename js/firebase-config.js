@@ -2,20 +2,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Конфигурация твоего Firebase проекта
 const firebaseConfig = {
-  // Твои ключи Firebase (вставь свои, если отличаются)
-  apiKey: "AIzaSy...", 
+  apiKey: "AIzaSyDQcXc5Pvl3MedAuOlpH2Dvr2VTlXwc-jM",
   authDomain: "school-portal-ff938.firebaseapp.com",
   projectId: "school-portal-ff938",
-  storageBucket: "school-portal-ff938.appspot.com",
-  messagingSenderId: "...",
-  appId: "..."
+  storageBucket: "school-portal-ff938.firebasestorage.app",
+  messagingSenderId: "569193226135",
+  appId: "1:569193226135:web:8f7b901a8f288d37e1eed2",
+  measurementId: "G-NVQG0DTXB3"
 };
 
-// 1. Инициализация приложения
+// Инициализация Firebase
 const app = initializeApp(firebaseConfig);
 
-// 2. Инициализация и ОБЯЗАТЕЛЬНЫЙ ЭКСПОРТ auth и db
+// Экспорт авторизации и базы данных
 export const auth = getAuth(app);
 export const db = getFirestore(app);
