@@ -22,6 +22,7 @@ function showMessage(msg, isError = true) {
 const loginForm = document.getElementById('loginForm');
 loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  e.stopPropagation();
   
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -44,9 +45,9 @@ loginForm?.addEventListener('submit', async (e) => {
     } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
       errorMsg = "Вы ввели неверный пароль.";
     } else if (error.code === 'auth/invalid-email') {
-      errorMsg = "Некорректный адрес Email.";
+      errorMsg = "Некорректный формат Email.";
     } else if (error.code === 'auth/too-many-requests') {
-      errorMsg = "Слишком много неверных попыток. Попробуйте позже.";
+      errorMsg = "Слишком много попыток. Попробуйте позже.";
     }
     
     showMessage(errorMsg, true);
@@ -62,6 +63,7 @@ loginForm?.addEventListener('submit', async (e) => {
 const registerForm = document.getElementById('registerForm');
 registerForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  e.stopPropagation();
 
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
@@ -92,7 +94,7 @@ registerForm?.addEventListener('submit', async (e) => {
     if (error.code === 'auth/email-already-in-use') {
       errorMsg = "Этот Email уже зарегистрирован!";
     } else if (error.code === 'auth/weak-password') {
-      errorMsg = "Пароль слишком простой (нужно минимум 6 символов).";
+      errorMsg = "Пароль слишком простой (минимум 6 символов).";
     } else {
       errorMsg += " " + error.message;
     }
@@ -110,6 +112,7 @@ registerForm?.addEventListener('submit', async (e) => {
 const resetForm = document.getElementById('resetForm');
 resetForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
+  e.stopPropagation();
 
   const emailInput = document.getElementById('resetEmail');
   const email = emailInput ? emailInput.value.trim() : "";
@@ -127,7 +130,7 @@ resetForm?.addEventListener('submit', async (e) => {
 
   try {
     await sendPasswordResetEmail(auth, email);
-    showMessage(`Инструкция по сбросу пароля отправлена на почту ${email}. Проверьте почту (включая папку "Спам")!`, false);
+    showMessage(`Письмо со ссылкой отправлено на ${email}. Проверьте почту (и папку Спам)!`, false);
   } catch (error) {
     console.error("Ошибка восстановления:", error);
     let errorMsg = "Не удалось отправить письмо.";
