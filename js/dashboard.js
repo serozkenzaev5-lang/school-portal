@@ -12,27 +12,23 @@ const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 let selectedDate = new Date();
-let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
+// Переменная теперь пустая и заполняется из Firebase
+let currentUserData = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
 });
 
 function initDashboard() {
-  const userNameEl = document.getElementById("userName");
-  const userRoleEl = document.getElementById("userRole");
-
-  if (userNameEl) userNameEl.innerText = currentUserData.name;
-  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
-
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
-  setupTeacherControls();
-  loadGrades();
-  loadTasks();
-  setupThemeToggle(); // Подключение темной темы
+  setupThemeToggle();
 
+  // Отслеживаем вход/выход пользователя через Firebase Auth
+  checkAuthState();
+
+  // Навигация по календарю
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -50,9 +46,86 @@ function initDashboard() {
     renderCalendar();
     renderScheduleForDate(selectedDate);
   });
+
+  // Кнопка выхода из аккаунта
+  document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    const auth = window.auth || (typeof firebase !== 'undefined' ? firebase.auth() : null);
+    if (auth) {
+      auth.signOut().then(() => {
+        window.location.href = "login.html"; // Или index.html (страница входа)
+      });
+    }
+  });
 }
 
-// Функция переключения светлой / темной темы
+// Загрузка данных вошедшего пользователя из Firebase
+function checkAuthState() {
+  const auth = window.auth || (typeof firebase !== 'undefined' ? firebase.auth() : null);
+  const db = window.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
+
+  if (!auth) {
+    console.error("Firebase Auth не подключен");
+    return;
+  }
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      let name = user.displayName || user.email || "Пользователь";
+      let role = "student"; // По умолчанию ученик
+
+      if (db) {
+        try {
+          // Ищем запись пользователя по его UID
+          const userDoc = await db.collection("users").doc(user.uid).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            name = userData.name || userData.fullName || name;
+            role = userData.role || role;
+          }
+        } catch (e) {
+          console.error("Ошибка загрузки профиля:", e);
+        }
+      }
+
+      currentUserData = { id: user.uid, name, role };
+
+      // Обновляем интерфейс профиля
+      updateUserProfileUI();
+      setupTeacherControls();
+      loadGrades();
+      loadTasks();
+
+    } else {
+      // Если не авторизован — перенаправляем на вход (при необходимости раскомментируйте):
+      // window.location.href = "login.html";
+    }
+  });
+}
+
+// Отображение имени, роли и аватарки
+function updateUserProfileUI() {
+  if (!currentUserData) return;
+
+  const userNameEl = document.getElementById("userName");
+  const userRoleEl = document.getElementById("userRole");
+  const avatarEl = document.getElementById("userAvatar");
+
+  if (userNameEl) userNameEl.innerText = currentUserData.name;
+  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
+
+  // Генерируем аватарку из первых букв имени
+  if (avatarEl && currentUserData.name) {
+    const initials = currentUserData.name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+    avatarEl.innerText = initials || "ШК";
+  }
+}
+
+// Переключение светлой / темной темы
 function setupThemeToggle() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
@@ -150,16 +223,20 @@ function renderScheduleForDate(date) {
 }
 
 async function setupTeacherControls() {
+  if (!currentUserData) return;
+
+  const teacherGradePanel = document.getElementById('teacherGradePanel');
+  const teacherTaskPanel = document.getElementById('teacherTaskPanel');
+
   if (currentUserData.role === 'teacher') {
-    document.getElementById('teacherGradePanel')?.classList.remove('hidden');
-    document.getElementById('teacherTaskPanel')?.classList.remove('hidden');
+    teacherGradePanel?.classList.remove('hidden');
+    teacherTaskPanel?.classList.remove('hidden');
     
     const select = document.getElementById('gradeStudentSelect');
     if (!select) return;
 
     select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
 
-    // Проверяем объект базы данных в глобальной области
     const firestoreDb = window.db || (typeof db !== 'undefined' ? db : null);
 
     try {
@@ -179,13 +256,15 @@ async function setupTeacherControls() {
           option.textContent = student.name || student.fullName || "Ученик";
           select.appendChild(option);
         });
-      } else {
-        select.innerHTML = '<option value="" disabled selected>Ошибка: Firebase не подключен</option>';
       }
     } catch (error) {
       console.error("Ошибка загрузки учеников из Firebase:", error);
       select.innerHTML = '<option value="" disabled selected>Ошибка загрузки списка</option>';
     }
+  } else {
+    // Если зашел ученик — скрываем панели учителя
+    teacherGradePanel?.classList.add('hidden');
+    teacherTaskPanel?.classList.add('hidden');
   }
 }
 
