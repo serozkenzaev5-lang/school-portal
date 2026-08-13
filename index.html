@@ -3,79 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный Портал</title>
+    <title>Школьный Портал — Авторизация</title>
     <!-- Заглушка для отмены ошибки 404 favicon.ico -->
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="auth-page">
+<body class="auth-page dark-theme">
 
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="school-logo">🎓</div>
-            <h2>Школьный Портал</h2>
-            <p id="authSubtitle">Вход в личный кабинет</p>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="school-logo">🎓</div>
+                <h2>Школьный Портал</h2>
+                <p id="authSubtitle">Вход в личный кабинет</p>
+            </div>
+
+            <!-- Блок для ошибок и сообщений -->
+            <div id="authMessage" class="auth-message hidden"></div>
+
+            <!-- 1. Форма входа -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="input-text" placeholder="name@school.ru" required>
+                </div>
+                
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="loginPassword">Пароль</label>
+                        <a href="#" id="showReset" class="link-secondary">Забыли пароль?</a>
+                    </div>
+                    <input type="password" id="loginPassword" class="input-text" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block" id="loginBtn">Войти</button>
+                
+                <p class="auth-toggle">
+                    Нет аккаунта? <a href="#" id="showRegister" class="link-primary">Зарегистрироваться</a>
+                </p>
+            </form>
+
+            <!-- 2. Форма регистрации -->
+            <form id="registerForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="regName">Имя и Фамилия</label>
+                    <input type="text" id="regName" class="input-text" placeholder="Иван Иванов" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" class="input-text" placeholder="name@school.ru" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">Пароль</label>
+                    <input type="password" id="regPassword" class="input-text" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regRole">Ваша роль</label>
+                    <select id="regRole" class="input-select" required>
+                        <option value="" disabled selected>Выберите вашу роль</option>
+                        <option value="student">Ученик</option>
+                        <option value="teacher">Учитель</option>
+                        <option value="parent">Родитель</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block" id="regBtn">Зарегистрироваться</button>
+                
+                <p class="auth-toggle">
+                    Уже есть аккаунт? <a href="#" id="showLoginFromReg" class="link-primary">Войти</a>
+                </p>
+            </form>
+
+            <!-- 3. Форма восстановления пароля -->
+            <form id="resetForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label for="resetEmail">Email адрес</label>
+                    <input type="email" id="resetEmail" class="input-text" placeholder="name@school.ru" required>
+                </div>
+
+                <p class="reset-info">Мы отправим ссылку для сброса пароля на вашу почту.</p>
+
+                <button type="submit" class="btn-primary btn-block" id="resetBtn">Сбросить пароль</button>
+                
+                <p class="auth-toggle">
+                    Вспомнили пароль? <a href="#" id="showLoginFromReset" class="link-primary">Вернуться ко входу</a>
+                </p>
+            </form>
         </div>
-
-        <!-- Форма входа -->
-        <form id="loginForm" class="auth-form">
-            <div class="input-group">
-                <input type="email" id="loginEmail" placeholder="Email" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="loginPassword" placeholder="Пароль" required>
-            </div>
-            <button type="submit" class="btn-primary" id="loginBtn">Войти</button>
-            
-            <p class="auth-toggle">
-                Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a>
-            </p>
-        </form>
-
-        <!-- Форма регистрации -->
-        <form id="registerForm" class="auth-form hidden">
-            <div class="input-group">
-                <input type="text" id="regName" placeholder="Имя и Фамилия" required>
-            </div>
-            <div class="input-group">
-                <input type="email" id="regEmail" placeholder="Email" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="regPassword" placeholder="Пароль" required>
-            </div>
-            <div class="input-group">
-                <select id="regRole" required>
-                    <option value="" disabled selected>Выберите вашу роль</option>
-                    <option value="student">Ученик</option>
-                    <option value="teacher">Учитель</option>
-                    <option value="parent">Родитель</option>
-                </select>
-            </div>
-            <button type="submit" class="btn-primary" id="regBtn">Зарегистрироваться</button>
-            
-            <p class="auth-toggle">
-                Уже есть аккаунт? <a href="#" id="showLogin">Войти</a>
-            </p>
-        </form>
     </div>
 
     <script type="module" src="js/auth.js"></script>
+    
     <script>
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
+        const resetForm = document.getElementById('resetForm');
         const subtitle = document.getElementById('authSubtitle');
+        const authMessage = document.getElementById('authMessage');
 
+        function hideAllForms() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            resetForm.classList.add('hidden');
+            if (authMessage) {
+                authMessage.classList.add('hidden');
+                authMessage.className = 'auth-message hidden';
+            }
+        }
+
+        // Переход на регистрацию
         document.getElementById('showRegister').addEventListener('click', (e) => {
             e.preventDefault();
-            loginForm.classList.add('hidden');
+            hideAllForms();
             registerForm.classList.remove('hidden');
             subtitle.textContent = 'Создайте новый аккаунт';
         });
 
-        document.getElementById('showLogin').addEventListener('click', (e) => {
+        // Переход на вход из регистрации
+        document.getElementById('showLoginFromReg').addEventListener('click', (e) => {
             e.preventDefault();
-            registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
+            hideAllForms();
+            loginForm.classList.remove('hidden');
+            subtitle.textContent = 'Вход в личный кабинет';
+        });
+
+        // Переход на сброс пароля
+        document.getElementById('showReset').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideAllForms();
+            resetForm.classList.remove('hidden');
+            subtitle.textContent = 'Восстановление пароля';
+        });
+
+        // Переход на вход из сброса пароля
+        document.getElementById('showLoginFromReset').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideAllForms();
+            loginForm.classList.remove('hidden');
             subtitle.textContent = 'Вход в личный кабинет';
         });
     </script>
