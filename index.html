@@ -4,28 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Школьный Портал — Авторизация</title>
-    <!-- Заглушка для отмены ошибки 404 favicon.ico -->
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="auth-page dark-theme">
 
     <div class="auth-container">
-        <!-- Кнопка переключения темы -->
-        <button id="authThemeToggle" class="theme-toggle-btn" title="Переключить тему">☀️</button>
-
         <div class="auth-card">
+            <!-- Кнопка темы теперь аккуратно внутри карточки справа -->
+            <button id="authThemeToggle" class="theme-toggle-btn" type="button" title="Переключить тему">☀️</button>
+
             <div class="auth-header">
                 <div class="school-logo">🎓</div>
                 <h2>Школьный Портал</h2>
                 <p id="authSubtitle">Вход в личный кабинет</p>
             </div>
 
-            <!-- Блок для ошибок и сообщений -->
+            <!-- Блок вывода ошибок и сообщений -->
             <div id="authMessage" class="auth-message hidden"></div>
 
             <!-- 1. Форма входа -->
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm" class="auth-form" onsubmit="return false;">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
                     <input type="email" id="loginEmail" class="input-text" placeholder="name@school.ru" required>
@@ -47,7 +46,7 @@
             </form>
 
             <!-- 2. Форма регистрации -->
-            <form id="registerForm" class="auth-form hidden">
+            <form id="registerForm" class="auth-form hidden" onsubmit="return false;">
                 <div class="form-group">
                     <label for="regName">Имя и Фамилия</label>
                     <input type="text" id="regName" class="input-text" placeholder="Иван Иванов" required>
@@ -81,7 +80,7 @@
             </form>
 
             <!-- 3. Форма восстановления пароля -->
-            <form id="resetForm" class="auth-form hidden">
+            <form id="resetForm" class="auth-form hidden" onsubmit="return false;">
                 <div class="form-group">
                     <label for="resetEmail">Email адрес</label>
                     <input type="email" id="resetEmail" class="input-text" placeholder="name@school.ru" required>
@@ -117,45 +116,41 @@
             }
         }
 
-        // Переход на регистрацию
-        document.getElementById('showRegister').addEventListener('click', (e) => {
+        document.getElementById('showRegister')?.addEventListener('click', (e) => {
             e.preventDefault();
             hideAllForms();
             registerForm.classList.remove('hidden');
             subtitle.textContent = 'Создайте новый аккаунт';
         });
 
-        // Переход на вход из регистрации
-        document.getElementById('showLoginFromReg').addEventListener('click', (e) => {
+        document.getElementById('showLoginFromReg')?.addEventListener('click', (e) => {
             e.preventDefault();
             hideAllForms();
             loginForm.classList.remove('hidden');
             subtitle.textContent = 'Вход в личный кабинет';
         });
 
-        // Переход на сброс пароля
-        document.getElementById('showReset').addEventListener('click', (e) => {
+        document.getElementById('showReset')?.addEventListener('click', (e) => {
             e.preventDefault();
             hideAllForms();
             resetForm.classList.remove('hidden');
             subtitle.textContent = 'Восстановление пароля';
         });
 
-        // Переход на вход из сброса пароля
-        document.getElementById('showLoginFromReset').addEventListener('click', (e) => {
+        document.getElementById('showLoginFromReset')?.addEventListener('click', (e) => {
             e.preventDefault();
             hideAllForms();
             loginForm.classList.remove('hidden');
             subtitle.textContent = 'Вход в личный кабинет';
         });
 
-        // Переключатель темы (светлая/тёмная)
+        // Переключение темы
         const themeBtn = document.getElementById('authThemeToggle');
         const savedTheme = localStorage.getItem('appTheme') || 'dark-theme';
         document.body.className = `auth-page ${savedTheme}`;
-        themeBtn.textContent = savedTheme === 'dark-theme' ? '☀️' : '🌙';
+        if (themeBtn) themeBtn.textContent = savedTheme === 'dark-theme' ? '☀️' : '🌙';
 
-        themeBtn.addEventListener('click', () => {
+        themeBtn?.addEventListener('click', () => {
             const isDark = document.body.classList.contains('dark-theme');
             const newTheme = isDark ? 'light-theme' : 'dark-theme';
             document.body.className = `auth-page ${newTheme}`;
