@@ -31,6 +31,7 @@ function initDashboard() {
   setupTeacherControls();
   loadGrades();
   loadTasks();
+  setupThemeToggle(); // Подключение темной темы
 
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
@@ -48,6 +49,25 @@ function initDashboard() {
     selectedDate = new Date();
     renderCalendar();
     renderScheduleForDate(selectedDate);
+  });
+}
+
+// Функция переключения светлой / темной темы
+function setupThemeToggle() {
+  const themeBtn = document.getElementById("themeToggle");
+  if (!themeBtn) return;
+
+  const savedTheme = localStorage.getItem("appTheme") || "light-theme";
+  document.body.className = savedTheme;
+  themeBtn.textContent = savedTheme === "dark-theme" ? "🌙" : "☀️";
+
+  themeBtn.addEventListener("click", () => {
+    const isDark = document.body.classList.contains("dark-theme");
+    const newTheme = isDark ? "light-theme" : "dark-theme";
+    
+    document.body.className = newTheme;
+    themeBtn.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("appTheme", newTheme);
   });
 }
 
@@ -139,9 +159,12 @@ async function setupTeacherControls() {
 
     select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
 
+    // Проверяем объект базы данных в глобальной области
+    const firestoreDb = window.db || (typeof db !== 'undefined' ? db : null);
+
     try {
-      if (typeof db !== 'undefined') {
-        const snapshot = await db.collection("users").where("role", "==", "student").get();
+      if (firestoreDb) {
+        const snapshot = await firestoreDb.collection("users").where("role", "==", "student").get();
         select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
 
         if (snapshot.empty) {
