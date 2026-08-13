@@ -12,22 +12,26 @@ const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 let selectedDate = new Date();
-let currentUserData = null;
+// Данные по умолчанию, чтобы сразу убрать "Загрузка..."
+let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
 
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
 });
 
 function initDashboard() {
+  // 1. Сразу же выводим имя и аватар, не дожидаясь ответа сервера
+  updateUserProfileUI();
+
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
   setupThemeToggle();
 
-  // Отслеживаем авторизацию
+  // 2. Безопасно пытаемся загрузить данные из Firebase
   checkAuthState();
 
-  // Навигация по календарю
+  // Кнопки календаря
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -45,65 +49,51 @@ function initDashboard() {
     renderCalendar();
     renderScheduleForDate(selectedDate);
   });
-
-  // Выход из аккаунта
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    const auth = window.auth || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth() : null);
-    if (auth) {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-  });
 }
 
-// Загрузка данных пользователя из Firebase Auth & Firestore
+// Безопасная проверка Firebase Auth & Firestore
 function checkAuthState() {
-  const auth = window.auth || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth() : null);
-  const db = window.db || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+  try {
+    const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
+    const db = window.db || ((typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null);
 
-  if (!auth) {
-    console.warn("Firebase Auth не найден. Загрузка стандартного профиля.");
-    currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
-    updateUserProfileUI();
-    setupTeacherControls();
-    return;
-  }
-
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      let name = user.displayName || user.email || "Пользователь";
-      let role = "student";
-
-      if (db) {
-        try {
-          const userDoc = await db.collection("users").doc(user.uid).get();
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            name = userData.name || userData.fullName || name;
-            role = userData.role || role;
-          }
-        } catch (e) {
-          console.error("Ошибка получения профиля из Firestore:", e);
-        }
-      }
-
-      currentUserData = { id: user.uid, name, role };
-      updateUserProfileUI();
+    if (!auth) {
+      console.warn("Firebase Auth не подключен. Используются локальные данные.");
       setupTeacherControls();
-      loadGrades();
-      loadTasks();
-
-    } else {
-      // Стандартный профиль, если вход в аккаунт ещё не выполнен
-      currentUserData = { id: "guest", name: "Хумаюн Чоршанбиев", role: "teacher" };
-      updateUserProfileUI();
-      setupTeacherControls();
+      return;
     }
-  });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        let name = user.displayName || user.email || "Пользователь";
+        let role = "student";
+
+        if (db) {
+          try {
+            const userDoc = await db.collection("users").doc(user.uid).get();
+            if (userDoc.exists) {
+              const userData = userDoc.data();
+              name = userData.name || userData.fullName || name;
+              role = userData.role || role;
+            }
+          } catch (e) {
+            console.error("Ошибка Firestore:", e);
+          }
+        }
+
+        currentUserData = { id: user.uid, name, role };
+        updateUserProfileUI();
+        setupTeacherControls();
+      } else {
+        setupTeacherControls();
+      }
+    });
+  } catch (err) {
+    console.error("Ошибка при работе с Firebase:", err);
+    setupTeacherControls();
+  }
 }
 
-// Обновление имени, роли и аватарки в шапке
 function updateUserProfileUI() {
   if (!currentUserData) return;
 
@@ -125,7 +115,6 @@ function updateUserProfileUI() {
   }
 }
 
-// Переключение светлой / темной темы
 function setupThemeToggle() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
@@ -237,7 +226,7 @@ async function setupTeacherControls() {
 
     select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
 
-    const firestoreDb = window.db || (typeof db !== 'undefined' ? db : null);
+    const firestoreDb = window.db || ((typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null);
 
     try {
       if (firestoreDb) {
@@ -264,20 +253,6 @@ async function setupTeacherControls() {
   } else {
     teacherGradePanel?.classList.add('hidden');
     teacherTaskPanel?.classList.add('hidden');
-  }
-}
-
-function loadGrades() {
-  const container = document.getElementById('gradesList');
-  if (container && container.children.length === 0) {
-    container.innerHTML = `<div class="card"><p>Оценок пока нет.</p></div>`;
-  }
-}
-
-function loadTasks() {
-  const container = document.getElementById('tasksList');
-  if (container && container.children.length === 0) {
-    container.innerHTML = `<div class="card"><p>Домашних заданий пока нет.</p></div>`;
   }
 }
 
