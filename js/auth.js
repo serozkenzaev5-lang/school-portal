@@ -9,13 +9,13 @@ import {
   setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Элемент для вывода красивых сообщений об ошибке или успехе
 const authMessage = document.getElementById('authMessage');
 
 function showMessage(msg, isError = true) {
   if (!authMessage) return;
   authMessage.textContent = msg;
   authMessage.className = `auth-message ${isError ? 'error' : 'success'}`;
+  authMessage.classList.remove('hidden');
 }
 
 // 1. Вход в аккаунт
@@ -37,12 +37,14 @@ loginForm?.addEventListener('submit', async (e) => {
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error("Ошибка входа:", error);
-    let errorMsg = "Не удалось войти: " + error.message;
+    let errorMsg = "Не удалось войти.";
     
     if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
       errorMsg = "Неверный Email или пароль.";
     } else if (error.code === 'auth/invalid-email') {
       errorMsg = "Некорректный адрес Email.";
+    } else {
+      errorMsg += " " + error.message;
     }
     
     showMessage(errorMsg, true);
@@ -74,7 +76,6 @@ registerForm?.addEventListener('submit', async (e) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Сохранение пользователя в Firebase Firestore
     await setDoc(doc(db, "users", user.uid), {
       name: name,
       email: email,
@@ -84,12 +85,14 @@ registerForm?.addEventListener('submit', async (e) => {
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error("Ошибка регистрации:", error);
-    let errorMsg = "Не удалось зарегистрироваться: " + error.message;
+    let errorMsg = "Не удалось зарегистрироваться.";
     
     if (error.code === 'auth/email-already-in-use') {
       errorMsg = "Этот Email уже зарегистрирован.";
     } else if (error.code === 'auth/weak-password') {
       errorMsg = "Пароль слишком простой (минимум 6 символов).";
+    } else {
+      errorMsg += " " + error.message;
     }
     
     showMessage(errorMsg, true);
@@ -101,13 +104,19 @@ registerForm?.addEventListener('submit', async (e) => {
   }
 });
 
-// 3. Восстановление пароля
+// 3. Восстановление пароля (с отправкой письма на почту)
 const resetForm = document.getElementById('resetForm');
 resetForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+  e.preventDefault(); // Запрещаем перезагрузку страницы
 
-  const email = document.getElementById('resetEmail').value.trim();
+  const emailInput = document.getElementById('resetEmail');
+  const email = emailInput ? emailInput.value.trim() : "";
   const resetBtn = document.getElementById('resetBtn');
+
+  if (!email) {
+    showMessage("Пожалуйста, введите Email адрес.", true);
+    return;
+  }
 
   if (resetBtn) {
     resetBtn.disabled = true;
@@ -115,16 +124,26 @@ resetForm?.addEventListener('submit', async (e) => {
   }
 
   try {
+    // Отправляем письмо с ссылкой для сброса пароля через Firebase
     await sendPasswordResetEmail(auth, email);
-    showMessage("Письмо со ссылкой для сброса пароля отправлено на ваш Email!", false);
+    
+    // Показываем плашку об успешной отправке
+    showMessage(`Письмо со ссылкой для восстановления пароля отправлено на ${email}. Проверьте почту!`, false);
+    
+    // Очищаем поле ввода
+    if (emailInput) emailInput.value = "";
   } catch (error) {
     console.error("Ошибка сброса пароля:", error);
-    let errorMsg = "Не удалось отправить письмо: " + error.message;
+    let errorMsg = "Не удалось отправить письмо.";
     
     if (error.code === 'auth/user-not-found') {
       errorMsg = "Пользователь с таким Email не найден.";
     } else if (error.code === 'auth/invalid-email') {
       errorMsg = "Некорректный адрес Email.";
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMsg = "Слишком много запросов. Попробуйте чуть позже.";
+    } else {
+      errorMsg += " " + error.message;
     }
     
     showMessage(errorMsg, true);
