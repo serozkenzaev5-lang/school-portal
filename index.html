@@ -11,6 +11,9 @@
 <body class="auth-page dark-theme">
 
     <div class="auth-container">
+        <!-- Кнопка переключения темы -->
+        <button id="authThemeToggle" class="theme-toggle-btn" title="Переключить тему">☀️</button>
+
         <div class="auth-card">
             <div class="auth-header">
                 <div class="school-logo">🎓</div>
@@ -84,7 +87,7 @@
                     <input type="email" id="resetEmail" class="input-text" placeholder="name@school.ru" required>
                 </div>
 
-                <p class="reset-info">Мы отправим ссылку для сброса пароля на вашу почту.</p>
+                <p class="reset-info">Мы отправим письмо со ссылкой для сброса пароля на вашу почту.</p>
 
                 <button type="submit" class="btn-primary btn-block" id="resetBtn">Сбросить пароль</button>
                 
@@ -110,7 +113,7 @@
             resetForm.classList.add('hidden');
             if (authMessage) {
                 authMessage.classList.add('hidden');
-                authMessage.className = 'auth-message hidden';
+                authMessage.innerText = '';
             }
         }
 
@@ -144,6 +147,20 @@
             hideAllForms();
             loginForm.classList.remove('hidden');
             subtitle.textContent = 'Вход в личный кабинет';
+        });
+
+        // Переключатель темы (светлая/тёмная)
+        const themeBtn = document.getElementById('authThemeToggle');
+        const savedTheme = localStorage.getItem('appTheme') || 'dark-theme';
+        document.body.className = `auth-page ${savedTheme}`;
+        themeBtn.textContent = savedTheme === 'dark-theme' ? '☀️' : '🌙';
+
+        themeBtn.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark-theme');
+            const newTheme = isDark ? 'light-theme' : 'dark-theme';
+            document.body.className = `auth-page ${newTheme}`;
+            themeBtn.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('appTheme', newTheme);
         });
     </script>
 </body>
