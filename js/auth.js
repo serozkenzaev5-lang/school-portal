@@ -29,7 +29,7 @@ loginForm?.addEventListener('submit', async (e) => {
 
   if (loginBtn) {
     loginBtn.disabled = true;
-    loginBtn.textContent = 'Вход...';
+    loginBtn.textContent = 'Проверка...';
   }
 
   try {
@@ -37,14 +37,16 @@ loginForm?.addEventListener('submit', async (e) => {
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error("Ошибка входа:", error);
-    let errorMsg = "Не удалось войти.";
-    
-    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      errorMsg = "Неверный Email или пароль.";
+    let errorMsg = "Неверный Email или пароль!";
+
+    if (error.code === 'auth/user-not-found') {
+      errorMsg = "Пользователь с таким Email не найден.";
+    } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      errorMsg = "Вы ввели неверный пароль.";
     } else if (error.code === 'auth/invalid-email') {
       errorMsg = "Некорректный адрес Email.";
-    } else {
-      errorMsg += " " + error.message;
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMsg = "Слишком много неверных попыток. Попробуйте позже.";
     }
     
     showMessage(errorMsg, true);
@@ -85,12 +87,12 @@ registerForm?.addEventListener('submit', async (e) => {
     window.location.href = "dashboard.html";
   } catch (error) {
     console.error("Ошибка регистрации:", error);
-    let errorMsg = "Не удалось зарегистрироваться.";
+    let errorMsg = "Ошибка регистрации.";
     
     if (error.code === 'auth/email-already-in-use') {
-      errorMsg = "Этот Email уже зарегистрирован.";
+      errorMsg = "Этот Email уже зарегистрирован!";
     } else if (error.code === 'auth/weak-password') {
-      errorMsg = "Пароль слишком простой (минимум 6 символов).";
+      errorMsg = "Пароль слишком простой (нужно минимум 6 символов).";
     } else {
       errorMsg += " " + error.message;
     }
@@ -104,17 +106,17 @@ registerForm?.addEventListener('submit', async (e) => {
   }
 });
 
-// 3. Восстановление пароля (с отправкой письма на почту)
+// 3. Восстановление пароля
 const resetForm = document.getElementById('resetForm');
 resetForm?.addEventListener('submit', async (e) => {
-  e.preventDefault(); // Запрещаем перезагрузку страницы
+  e.preventDefault();
 
   const emailInput = document.getElementById('resetEmail');
   const email = emailInput ? emailInput.value.trim() : "";
   const resetBtn = document.getElementById('resetBtn');
 
   if (!email) {
-    showMessage("Пожалуйста, введите Email адрес.", true);
+    showMessage("Введите Email адрес.", true);
     return;
   }
 
@@ -124,24 +126,16 @@ resetForm?.addEventListener('submit', async (e) => {
   }
 
   try {
-    // Отправляем письмо с ссылкой для сброса пароля через Firebase
     await sendPasswordResetEmail(auth, email);
-    
-    // Показываем плашку об успешной отправке
-    showMessage(`Письмо со ссылкой для восстановления пароля отправлено на ${email}. Проверьте почту!`, false);
-    
-    // Очищаем поле ввода
-    if (emailInput) emailInput.value = "";
+    showMessage(`Инструкция по сбросу пароля отправлена на почту ${email}. Проверьте почту (включая папку "Спам")!`, false);
   } catch (error) {
-    console.error("Ошибка сброса пароля:", error);
+    console.error("Ошибка восстановления:", error);
     let errorMsg = "Не удалось отправить письмо.";
     
     if (error.code === 'auth/user-not-found') {
-      errorMsg = "Пользователь с таким Email не найден.";
+      errorMsg = "Аккаунт с таким Email не зарегистрирован.";
     } else if (error.code === 'auth/invalid-email') {
-      errorMsg = "Некорректный адрес Email.";
-    } else if (error.code === 'auth/too-many-requests') {
-      errorMsg = "Слишком много запросов. Попробуйте чуть позже.";
+      errorMsg = "Введите корректный Email адрес.";
     } else {
       errorMsg += " " + error.message;
     }
