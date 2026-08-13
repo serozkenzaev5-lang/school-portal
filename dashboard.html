@@ -124,15 +124,8 @@
         </nav>
     </div>
 
-    <!-- Firebase SDK (Подключаются строго в этом порядке) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Конфигурация Firebase -->
-    <script src="js/firebase-config.js"></script>
-
-    <!-- Основная логика -->
-    <script src="js/dashboard.js"></script>
+    <!-- Подключаем Firebase и логику как модули -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
