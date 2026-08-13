@@ -12,7 +12,6 @@ const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 let selectedDate = new Date();
-// Переменная теперь пустая и заполняется из Firebase
 let currentUserData = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -25,7 +24,7 @@ function initDashboard() {
   initBottomNav();
   setupThemeToggle();
 
-  // Отслеживаем вход/выход пользователя через Firebase Auth
+  // Отслеживаем авторизацию
   checkAuthState();
 
   // Навигация по календарю
@@ -47,35 +46,37 @@ function initDashboard() {
     renderScheduleForDate(selectedDate);
   });
 
-  // Кнопка выхода из аккаунта
+  // Выход из аккаунта
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    const auth = window.auth || (typeof firebase !== 'undefined' ? firebase.auth() : null);
+    const auth = window.auth || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth() : null);
     if (auth) {
       auth.signOut().then(() => {
-        window.location.href = "login.html"; // Или index.html (страница входа)
+        window.location.href = "login.html";
       });
     }
   });
 }
 
-// Загрузка данных вошедшего пользователя из Firebase
+// Загрузка данных пользователя из Firebase Auth & Firestore
 function checkAuthState() {
-  const auth = window.auth || (typeof firebase !== 'undefined' ? firebase.auth() : null);
-  const db = window.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
+  const auth = window.auth || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth() : null);
+  const db = window.db || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
 
   if (!auth) {
-    console.error("Firebase Auth не подключен");
+    console.warn("Firebase Auth не найден. Загрузка стандартного профиля.");
+    currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
+    updateUserProfileUI();
+    setupTeacherControls();
     return;
   }
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       let name = user.displayName || user.email || "Пользователь";
-      let role = "student"; // По умолчанию ученик
+      let role = "student";
 
       if (db) {
         try {
-          // Ищем запись пользователя по его UID
           const userDoc = await db.collection("users").doc(user.uid).get();
           if (userDoc.exists) {
             const userData = userDoc.data();
@@ -83,26 +84,26 @@ function checkAuthState() {
             role = userData.role || role;
           }
         } catch (e) {
-          console.error("Ошибка загрузки профиля:", e);
+          console.error("Ошибка получения профиля из Firestore:", e);
         }
       }
 
       currentUserData = { id: user.uid, name, role };
-
-      // Обновляем интерфейс профиля
       updateUserProfileUI();
       setupTeacherControls();
       loadGrades();
       loadTasks();
 
     } else {
-      // Если не авторизован — перенаправляем на вход (при необходимости раскомментируйте):
-      // window.location.href = "login.html";
+      // Стандартный профиль, если вход в аккаунт ещё не выполнен
+      currentUserData = { id: "guest", name: "Хумаюн Чоршанбиев", role: "teacher" };
+      updateUserProfileUI();
+      setupTeacherControls();
     }
   });
 }
 
-// Отображение имени, роли и аватарки
+// Обновление имени, роли и аватарки в шапке
 function updateUserProfileUI() {
   if (!currentUserData) return;
 
@@ -113,7 +114,6 @@ function updateUserProfileUI() {
   if (userNameEl) userNameEl.innerText = currentUserData.name;
   if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
 
-  // Генерируем аватарку из первых букв имени
   if (avatarEl && currentUserData.name) {
     const initials = currentUserData.name
       .split(" ")
@@ -262,7 +262,6 @@ async function setupTeacherControls() {
       select.innerHTML = '<option value="" disabled selected>Ошибка загрузки списка</option>';
     }
   } else {
-    // Если зашел ученик — скрываем панели учителя
     teacherGradePanel?.classList.add('hidden');
     teacherTaskPanel?.classList.add('hidden');
   }
