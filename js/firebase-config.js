@@ -1,7 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 // Ваши ключи из консоли Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDQcXc5Pvl3MedAuOlpH2Dvr2VTlXwc-jM",
@@ -13,7 +9,11 @@ const firebaseConfig = {
   measurementId: "G-NVQG0DTXB3"
 };
 
-// Инициализация сервисов
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Инициализация Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+// Делаем базы данных доступными для dashboard.js
+window.db = firebase.firestore();
+window.auth = firebase.auth();
