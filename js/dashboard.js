@@ -1,6 +1,16 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { 
+  doc, 
+  getDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  addDoc, 
+  orderBy, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Расписание по умолчанию
 const defaultSchedule = {
@@ -25,7 +35,7 @@ const roleTranslations = {
 let selectedDate = new Date();
 let currentUserData = null;
 
-// Инициализация интерфейса при загрузке страницы
+// Инициализация при загрузке DOM
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
 });
@@ -36,8 +46,9 @@ function initDashboard() {
   initBottomNav();
   setupThemeToggle();
   setupLogout();
+  setupFormListeners(); // Подключаем обработчики форм
 
-  // Отслеживание состояния авторизации Firebase
+  // Авторизация Firebase
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       let name = user.displayName || user.email || "Пользователь";
@@ -53,19 +64,22 @@ function initDashboard() {
           role = userData.role || role;
         }
       } catch (e) {
-        console.error("Ошибка загрузки данных из Firestore:", e);
+        console.error("Ошибка загрузки профиля:", e);
       }
 
       currentUserData = { id: user.uid, name, role };
       updateUserProfileUI();
       setupTeacherControls();
+
+      // Загружаем оценки и домашние задания из базы
+      loadGrades();
+      loadTasks();
     } else {
-      // Перенаправляем на страницу входа, если пользователь не авторизован
       window.location.href = "index.html";
     }
   });
 
-  // Элементы управления календарем
+  // Кнопки переключения недели
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -85,7 +99,9 @@ function initDashboard() {
   });
 }
 
-// 1. ОБНОВЛЕНИЕ ПРОФИЛЯ В ШАПКЕ
+// -------------------------------------------------------------
+// 1. ПРОФИЛЬ И ШАПКА
+// -------------------------------------------------------------
 function updateUserProfileUI() {
   if (!currentUserData) return;
 
@@ -109,7 +125,190 @@ function updateUserProfileUI() {
   }
 }
 
-// 2. ВЫХОД ИЗ СИСТЕМЫ (🚪)
+// -------------------------------------------------------------
+// 2. ВЫСТАВЛЕНИЕ ОЦЕНОК И ДОБАВЛЕНИЕ ДЗ (Формы)
+// -------------------------------------------------------------
+function setupFormListeners() {
+  const addGradeForm = document.getElementById('addGradeForm');
+  const addTaskForm = document.getElementById('addTaskForm');
+
+  // Форма добавления оценки (для Учителя)
+  if (addGradeForm) {
+    addGradeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const studentSelect = document.getElementById('gradeStudentSelect');
+      const studentId = studentSelect.value;
+      const studentName = studentSelect.options[studentSelect.selectedIndex].text;
+      const subject = document.getElementById('gradeSubjectSelect').value;
+      const value = document.getElementById('gradeValueSelect').value;
+      const reason = document.getElementById('gradeReasonInput').value;
+
+      if (!studentId) {
+        alert("Пожалуйста, выберите ученика!");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "grades"), {
+          studentId,
+          studentName,
+          subject,
+          value,
+          reason,
+          teacherId: currentUserData.id,
+          createdAt: serverTimestamp(),
+          dateStr: new Date().toLocaleDateString('ru-RU')
+        });
+
+        alert("Отметка успешно выставлена!");
+        addGradeForm.reset();
+        loadGrades(); // Перезагружаем список оценок
+      } catch (error) {
+        console.error("Ошибка сохранения оценки:", error);
+        alert("Не удалось сохранить оценку. Попробуйте еще раз.");
+      }
+    });
+  }
+
+  // Форма добавления домашнего задания (для Учителя)
+  if (addTaskForm) {
+    addTaskForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const subject = document.getElementById('taskSubjectSelect').value;
+      const dueDate = document.getElementById('taskDueDate').value;
+      const description = document.getElementById('taskDescInput').value;
+
+      try {
+        await addDoc(collection(db, "tasks"), {
+          subject,
+          dueDate,
+          description,
+          teacherId: currentUserData.id,
+          createdAt: serverTimestamp()
+        });
+
+        alert("Домашнее задание опубликовано!");
+        addTaskForm.reset();
+        loadTasks(); // Перезагружаем список ДЗ
+      } catch (error) {
+        console.error("Ошибка публикации ДЗ:", error);
+        alert("Не удалось опубликовать задание.");
+      }
+    });
+  }
+}
+
+// -------------------------------------------------------------
+// 3. ЗАГРУЗКА И ОТОБРАЖЕНИЕ ОЦЕНОК
+// -------------------------------------------------------------
+async function loadGrades() {
+  const gradesListContainer = document.getElementById('gradesList');
+  if (!gradesListContainer || !currentUserData) return;
+
+  gradesListContainer.innerHTML = "<p>Загрузка отметок...</p>";
+
+  try {
+    let q;
+    // Если текущий пользователь — ученик, подтягиваем только ЕГО оценки
+    if (currentUserData.role === 'student') {
+      q = query(
+        collection(db, "grades"), 
+        where("studentId", "==", currentUserData.id)
+      );
+    } else {
+      // Учителю/Родителю показываем все выставленные оценки
+      q = query(collection(db, "grades"), orderBy("createdAt", "desc"));
+    }
+
+    const querySnapshot = await getDocs(q);
+    gradesListContainer.innerHTML = "";
+
+    if (querySnapshot.empty) {
+      gradesListContainer.innerHTML = "<p>Отметок пока нет.</p>";
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const grade = docSnap.data();
+      const card = document.createElement("div");
+      card.className = "card grade-card";
+      card.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 14px;";
+
+      // Форматируем дату выставления
+      const dateText = grade.dateStr || "Недавно";
+
+      card.innerHTML = `
+        <div>
+          <h4 style="margin: 0 0 4px 0;">${grade.subject}</h4>
+          <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">${grade.reason}</p>
+          ${currentUserData.role !== 'student' ? `<small style="opacity: 0.6;">Ученик: ${grade.studentName}</small>` : ''}
+        </div>
+        <div style="text-align: right;">
+          <span class="badge-value" style="font-size: 1.4rem; font-weight: bold; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 8px;">${grade.value}</span>
+          <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.6;">${dateText}</div>
+        </div>
+      `;
+
+      gradesListContainer.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Ошибка загрузки отметок:", error);
+    gradesListContainer.innerHTML = "<p>Ошибка загрузки отметок из базы.</p>";
+  }
+}
+
+// -------------------------------------------------------------
+// 4. ЗАГРУЗКА И ОТОБРАЖЕНИЕ ДОМАШНИХ ЗАДАНИЙ
+// -------------------------------------------------------------
+async function loadTasks() {
+  const tasksListContainer = document.getElementById('tasksList');
+  if (!tasksListContainer) return;
+
+  tasksListContainer.innerHTML = "<p>Загрузка заданий...</p>";
+
+  try {
+    const q = query(collection(db, "tasks"), orderBy("createdAt", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    tasksListContainer.innerHTML = "";
+
+    if (querySnapshot.empty) {
+      tasksListContainer.innerHTML = "<p>Домашних заданий пока нет.</p>";
+      return;
+    }
+
+    querySnapshot.forEach((docSnap) => {
+      const task = docSnap.data();
+      const card = document.createElement("div");
+      card.className = "card task-card";
+      card.style.cssText = "margin-bottom: 12px; padding: 14px;";
+
+      // Преобразуем красивую дату сдачи
+      const formatDueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : 'Не указана';
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="margin: 0;">${task.subject}</h4>
+          <span style="font-size: 0.8rem; background: rgba(255,200,0,0.2); padding: 2px 8px; border-radius: 4px;">До: ${formatDueDate}</span>
+        </div>
+        <p style="margin: 0; font-size: 0.9rem; line-height: 1.4;">${task.description}</p>
+      `;
+
+      tasksListContainer.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Ошибка загрузки ДЗ:", error);
+    tasksListContainer.innerHTML = "<p>Ошибка загрузки заданий из базы.</p>";
+  }
+}
+
+// -------------------------------------------------------------
+// 5. ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ И ИНТЕРФЕЙС
+// -------------------------------------------------------------
 function setupLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (!logoutBtn) return;
@@ -124,7 +323,6 @@ function setupLogout() {
   });
 }
 
-// 3. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (☀️ / 🌙)
 function setupThemeToggle() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
@@ -143,7 +341,6 @@ function setupThemeToggle() {
   });
 }
 
-// 4. ОТОБРАЖЕНИЕ КАЛЕНДАРЯ
 function renderCalendar() {
   const container = document.getElementById("calendarDays");
   const monthYearHeader = document.getElementById("currentMonthYear");
@@ -186,7 +383,6 @@ function renderCalendar() {
   }
 }
 
-// 5. ОТОБРАЖЕНИЕ РАСПИСАНИЯ
 function renderScheduleForDate(date) {
   const scheduleContainer = document.getElementById("scheduleList");
   const dateTitle = document.getElementById("selectedDateTitle");
@@ -223,7 +419,6 @@ function renderScheduleForDate(date) {
   });
 }
 
-// 6. НАСТРОЙКА ПАНЕЛЕЙ ДЛЯ УЧИТЕЛЯ
 async function setupTeacherControls() {
   if (!currentUserData) return;
 
@@ -267,7 +462,6 @@ async function setupTeacherControls() {
   }
 }
 
-// 7. НАВИГАЦИЯ ПО ВКЛАДКАМ
 function initBottomNav() {
   const navItems = document.querySelectorAll('.bottom-nav .nav-item');
   const tabPages = document.querySelectorAll('.tab-page');
