@@ -12,6 +12,159 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// -------------------------------------------------------------
+// СЛОВАРЬ ПЕРЕВОДОВ (i18n)
+// -------------------------------------------------------------
+const translations = {
+  ru: {
+    roleTeacher: "Учитель",
+    roleStudent: "Ученик",
+    roleParent: "Родитель",
+    navSchedule: "Расписание",
+    navGrades: "Отметки",
+    navTasks: "Задания",
+    titleSchedule: "Расписание",
+    titleGrades: "Успеваемость и отметки",
+    titleTasks: "Домашние задания",
+    teacherGradeTitle: "Выставить оценку / отметку",
+    teacherTaskTitle: "Добавить домашнее задание",
+    btnToday: "Сегодня",
+    btnSaveGrade: "Сохранить отметку",
+    btnPublishTask: "Опубликовать ДЗ",
+    phReason: "Причина (например: Контрольная работа)",
+    phTaskDesc: "Описание задания...",
+    vacationTitle: "🌴 Летние каникулы",
+    vacationDesc: "Учебные занятия начнутся с 1 сентября 2026 года.",
+    offDay: "Выходной день",
+    loadingStudents: "Загрузка учеников...",
+    selectStudent: "Выберите ученика",
+    noStudents: "Ученики в базе не найдены",
+    loadingGrades: "Загрузка отметок...",
+    noGrades: "Отметок пока нет.",
+    loadingTasks: "Загрузка заданий...",
+    noTasks: "Домашних заданий пока нет.",
+    dueTo: "До",
+    dayNames: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+    monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+    subjects: {
+      "Математика": "Математика",
+      "Русский язык": "Русский язык",
+      "Английский язык": "Английский язык",
+      "Физика": "Физика",
+      "Python": "Python",
+      "История": "История",
+      "Информатика": "Информатика",
+      "Геометрия": "Геометрия",
+      "Биология": "Биология",
+      "География": "География",
+      "Химия": "Химия",
+      "Литература": "Литература",
+      "Обществознание": "Обществознание",
+      "Физкультура": "Физкультура",
+      "Алгебра": "Алгебра",
+      "ИЗО": "ИЗО"
+    }
+  },
+  en: {
+    roleTeacher: "Teacher",
+    roleStudent: "Student",
+    roleParent: "Parent",
+    navSchedule: "Schedule",
+    navGrades: "Grades",
+    navTasks: "Tasks",
+    titleSchedule: "Schedule",
+    titleGrades: "Academic Performance & Marks",
+    titleTasks: "Homework Tasks",
+    teacherGradeTitle: "Assign Grade / Mark",
+    teacherTaskTitle: "Add Homework",
+    btnToday: "Today",
+    btnSaveGrade: "Save Mark",
+    btnPublishTask: "Publish Homework",
+    phReason: "Reason (e.g. Test / Exam)",
+    phTaskDesc: "Task description...",
+    vacationTitle: "🌴 Summer Break",
+    vacationDesc: "Classes will resume on September 1, 2026.",
+    offDay: "Day Off",
+    loadingStudents: "Loading students...",
+    selectStudent: "Select a student",
+    noStudents: "No students found in database",
+    loadingGrades: "Loading marks...",
+    noGrades: "No marks available yet.",
+    loadingTasks: "Loading tasks...",
+    noTasks: "No homework assigned yet.",
+    dueTo: "Due",
+    dayNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    subjects: {
+      "Математика": "Mathematics",
+      "Русский язык": "Russian Language",
+      "Английский язык": "English",
+      "Физика": "Physics",
+      "Python": "Python",
+      "История": "History",
+      "Информатика": "Computer Science",
+      "Геометрия": "Geometry",
+      "Биология": "Biology",
+      "География": "Geography",
+      "Химия": "Chemistry",
+      "Литература": "Literature",
+      "Обществознание": "Social Studies",
+      "Физкультура": "PE",
+      "Алгебра": "Algebra",
+      "ИЗО": "Art"
+    }
+  },
+  uz: {
+    roleTeacher: "O'qituvchi",
+    roleStudent: "O'quvchi",
+    roleParent: "Ota-ona",
+    navSchedule: "Jadval",
+    navGrades: "Boholar",
+    navTasks: "Vazifalar",
+    titleSchedule: "Dars jadvali",
+    titleGrades: "O'zlashtirish va boholar",
+    titleTasks: "Uy vazifalari",
+    teacherGradeTitle: "Baho / belgi qo'yish",
+    teacherTaskTitle: "Uy vazifasi qo'shish",
+    btnToday: "Bugun",
+    btnSaveGrade: "Bahoni saqlash",
+    btnPublishTask: "Vazifani e'lon qilish",
+    phReason: "Sababi (masalan: Nazorat ishi)",
+    phTaskDesc: "Vazifa tavsifi...",
+    vacationTitle: "🌴 Yozgi ta'til",
+    vacationDesc: "Darslar 2026-yil 1-sentabrdan boshlanadi.",
+    offDay: "Dam olish kuni",
+    loadingStudents: "O'quvchilar yuklanmoqda...",
+    selectStudent: "O'quvchini tanlang",
+    noStudents: "Bazada o'quvchilar topilmadi",
+    loadingGrades: "Boholar yuklanmoqda...",
+    noGrades: "Hozircha boholar yo'q.",
+    loadingTasks: "Vazifalar yuklanmoqda...",
+    noTasks: "Hozircha uy vazifalari yo'q.",
+    dueTo: "Muddati",
+    dayNames: ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"],
+    monthNames: ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentabr", "Oktabr", "Noyabr", "Dekabr"],
+    subjects: {
+      "Математика": "Matematika",
+      "Русский язык": "Rus tili",
+      "Английский язык": "Ingliz tili",
+      "Физика": "Fizika",
+      "Python": "Python",
+      "История": "Tarix",
+      "Информатика": "Informatika",
+      "Геометрия": "Geometriya",
+      "Биология": "Biologiya",
+      "География": "Geografiya",
+      "Химия": "Kimyo",
+      "Литература": "Adabiyot",
+      "Обществознание": "Jamiyatshunoslik",
+      "Физкультура": "Jismoniy tarbiya",
+      "Алгебра": "Algebra",
+      "ИЗО": "Tasviriy san'at"
+    }
+  }
+};
+
 // Расписание по умолчанию
 const defaultSchedule = {
   1: ["Математика", "Русский язык", "История", "Физика"],
@@ -23,17 +176,9 @@ const defaultSchedule = {
   0: ["Выходной день"]
 };
 
-const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-
-const roleTranslations = {
-  teacher: "Учитель",
-  student: "Ученик",
-  parent: "Родитель"
-};
-
 let selectedDate = new Date();
 let currentUserData = null;
+let currentLang = localStorage.getItem("appLang") || "ru";
 
 // Инициализация при загрузке DOM
 document.addEventListener("DOMContentLoaded", () => {
@@ -41,12 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initDashboard() {
+  setupLanguageSelect();
+  applyLanguage();
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
   setupThemeToggle();
   setupLogout();
-  setupFormListeners(); // Подключаем обработчики форм
+  setupFormListeners();
 
   // Авторизация Firebase
   onAuthStateChanged(auth, async (user) => {
@@ -71,7 +218,6 @@ function initDashboard() {
       updateUserProfileUI();
       setupTeacherControls();
 
-      // Загружаем оценки и домашние задания из базы
       loadGrades();
       loadTasks();
     } else {
@@ -79,7 +225,7 @@ function initDashboard() {
     }
   });
 
-  // Кнопки переключения недели
+  // Управление календарем
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -100,39 +246,95 @@ function initDashboard() {
 }
 
 // -------------------------------------------------------------
-// 1. ПРОФИЛЬ И ШАПКА
+// 1. СМЕНА И ПРИМЕНЕНИЕ ЯЗЫКА
+// -------------------------------------------------------------
+function setupLanguageSelect() {
+  const langSelect = document.getElementById("langSelect");
+  if (!langSelect) return;
+
+  langSelect.value = currentLang;
+
+  langSelect.addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    localStorage.setItem("appLang", currentLang);
+    
+    // Перерисовываем элементы при смене языка
+    applyLanguage();
+    updateUserProfileUI();
+    renderCalendar();
+    renderScheduleForDate(selectedDate);
+    setupTeacherControls();
+    loadGrades();
+    loadTasks();
+  });
+}
+
+function applyLanguage() {
+  const t = translations[currentLang] || translations.ru;
+
+  // Кнопки и статичный текст
+  const btnToday = document.getElementById("btnToday");
+  if (btnToday) btnToday.innerText = t.btnToday;
+
+  // Навигация снизу
+  const navItems = document.querySelectorAll(".bottom-nav .nav-item small");
+  if (navItems.length >= 3) {
+    navItems[0].innerText = t.navSchedule;
+    navItems[1].innerText = t.navGrades;
+    navItems[2].innerText = t.navTasks;
+  }
+
+  // Заголовки разделов
+  const gradesHeader = document.querySelector("#tab-grades h3");
+  if (gradesHeader) gradesHeader.innerText = t.titleGrades;
+
+  const tasksHeader = document.querySelector("#tab-tasks h3");
+  if (tasksHeader) tasksHeader.innerText = t.titleTasks;
+
+  const teacherGradeHeader = document.querySelector("#teacherGradePanel h4");
+  if (teacherGradeHeader) teacherGradeHeader.innerText = t.teacherGradeTitle;
+
+  const teacherTaskHeader = document.querySelector("#teacherTaskPanel h4");
+  if (teacherTaskHeader) teacherTaskHeader.innerText = t.teacherTaskTitle;
+
+  // Формы и поля ввода
+  const reasonInput = document.getElementById("gradeReasonInput");
+  if (reasonInput) reasonInput.placeholder = t.phReason;
+
+  const taskDescInput = document.getElementById("taskDescInput");
+  if (taskDescInput) taskDescInput.placeholder = t.phTaskDesc;
+
+  const submitGradeBtn = document.querySelector("#addGradeForm button[type='submit']");
+  if (submitGradeBtn) submitGradeBtn.innerText = t.btnSaveGrade;
+
+  const submitTaskBtn = document.querySelector("#addTaskForm button[type='submit']");
+  if (submitTaskBtn) submitTaskBtn.innerText = t.btnPublishTask;
+}
+
+// -------------------------------------------------------------
+// 2. ПРОФИЛЬ
 // -------------------------------------------------------------
 function updateUserProfileUI() {
   if (!currentUserData) return;
+  const t = translations[currentLang] || translations.ru;
 
   const userNameEl = document.getElementById("userName");
   const userRoleEl = document.getElementById("userRole");
-  const avatarEl = document.getElementById("userAvatar");
 
   if (userNameEl) userNameEl.innerText = currentUserData.name;
-  if (userRoleEl) userRoleEl.innerText = roleTranslations[currentUserData.role] || currentUserData.role;
-
-  if (avatarEl && currentUserData.name) {
-    const initials = currentUserData.name
-      .trim()
-      .split(" ")
-      .filter(part => part.length > 0)
-      .map(part => part[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-    avatarEl.innerText = initials || "ШК";
+  if (userRoleEl) {
+    const roleKey = "role" + currentUserData.role.charAt(0).toUpperCase() + currentUserData.role.slice(1);
+    userRoleEl.innerText = t[roleKey] || currentUserData.role;
   }
 }
 
 // -------------------------------------------------------------
-// 2. ВЫСТАВЛЕНИЕ ОЦЕНОК И ДОБАВЛЕНИЕ ДЗ (Формы)
+// 3. ФОРМЫ (ОЦЕНКИ И ДЗ)
 // -------------------------------------------------------------
 function setupFormListeners() {
   const addGradeForm = document.getElementById('addGradeForm');
   const addTaskForm = document.getElementById('addTaskForm');
 
-  // Форма добавления оценки (для Учителя)
   if (addGradeForm) {
     addGradeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -144,10 +346,7 @@ function setupFormListeners() {
       const value = document.getElementById('gradeValueSelect').value;
       const reason = document.getElementById('gradeReasonInput').value;
 
-      if (!studentId) {
-        alert("Пожалуйста, выберите ученика!");
-        return;
-      }
+      if (!studentId) return;
 
       try {
         await addDoc(collection(db, "grades"), {
@@ -161,17 +360,14 @@ function setupFormListeners() {
           dateStr: new Date().toLocaleDateString('ru-RU')
         });
 
-        alert("Отметка успешно выставлена!");
         addGradeForm.reset();
-        loadGrades(); // Перезагружаем список оценок
+        loadGrades();
       } catch (error) {
         console.error("Ошибка сохранения оценки:", error);
-        alert("Не удалось сохранить оценку. Попробуйте еще раз.");
       }
     });
   }
 
-  // Форма добавления домашнего задания (для Учителя)
   if (addTaskForm) {
     addTaskForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -189,36 +385,30 @@ function setupFormListeners() {
           createdAt: serverTimestamp()
         });
 
-        alert("Домашнее задание опубликовано!");
         addTaskForm.reset();
-        loadTasks(); // Перезагружаем список ДЗ
+        loadTasks();
       } catch (error) {
         console.error("Ошибка публикации ДЗ:", error);
-        alert("Не удалось опубликовать задание.");
       }
     });
   }
 }
 
 // -------------------------------------------------------------
-// 3. ЗАГРУЗКА И ОТОБРАЖЕНИЕ ОЦЕНОК
+// 4. ОТОБРАЖЕНИЕ ОЦЕНОК
 // -------------------------------------------------------------
 async function loadGrades() {
   const gradesListContainer = document.getElementById('gradesList');
   if (!gradesListContainer || !currentUserData) return;
 
-  gradesListContainer.innerHTML = "<p>Загрузка отметок...</p>";
+  const t = translations[currentLang] || translations.ru;
+  gradesListContainer.innerHTML = `<p>${t.loadingGrades}</p>`;
 
   try {
     let q;
-    // Если текущий пользователь — ученик, подтягиваем только ЕГО оценки
     if (currentUserData.role === 'student') {
-      q = query(
-        collection(db, "grades"), 
-        where("studentId", "==", currentUserData.id)
-      );
+      q = query(collection(db, "grades"), where("studentId", "==", currentUserData.id));
     } else {
-      // Учителю/Родителю показываем все выставленные оценки
       q = query(collection(db, "grades"), orderBy("createdAt", "desc"));
     }
 
@@ -226,7 +416,7 @@ async function loadGrades() {
     gradesListContainer.innerHTML = "";
 
     if (querySnapshot.empty) {
-      gradesListContainer.innerHTML = "<p>Отметок пока нет.</p>";
+      gradesListContainer.innerHTML = `<p>${t.noGrades}</p>`;
       return;
     }
 
@@ -236,18 +426,16 @@ async function loadGrades() {
       card.className = "card grade-card";
       card.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 14px;";
 
-      // Форматируем дату выставления
-      const dateText = grade.dateStr || "Недавно";
+      const subjectTranslated = t.subjects[grade.subject] || grade.subject;
 
       card.innerHTML = `
         <div>
-          <h4 style="margin: 0 0 4px 0;">${grade.subject}</h4>
+          <h4 style="margin: 0 0 4px 0;">${subjectTranslated}</h4>
           <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">${grade.reason}</p>
-          ${currentUserData.role !== 'student' ? `<small style="opacity: 0.6;">Ученик: ${grade.studentName}</small>` : ''}
+          ${currentUserData.role !== 'student' ? `<small style="opacity: 0.6;">${grade.studentName}</small>` : ''}
         </div>
         <div style="text-align: right;">
           <span class="badge-value" style="font-size: 1.4rem; font-weight: bold; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 8px;">${grade.value}</span>
-          <div style="font-size: 0.75rem; margin-top: 4px; opacity: 0.6;">${dateText}</div>
         </div>
       `;
 
@@ -256,18 +444,18 @@ async function loadGrades() {
 
   } catch (error) {
     console.error("Ошибка загрузки отметок:", error);
-    gradesListContainer.innerHTML = "<p>Ошибка загрузки отметок из базы.</p>";
   }
 }
 
 // -------------------------------------------------------------
-// 4. ЗАГРУЗКА И ОТОБРАЖЕНИЕ ДОМАШНИХ ЗАДАНИЙ
+// 5. ОТОБРАЖЕНИЕ ДОМАШНИХ ЗАДАНИЙ
 // -------------------------------------------------------------
 async function loadTasks() {
   const tasksListContainer = document.getElementById('tasksList');
   if (!tasksListContainer) return;
 
-  tasksListContainer.innerHTML = "<p>Загрузка заданий...</p>";
+  const t = translations[currentLang] || translations.ru;
+  tasksListContainer.innerHTML = `<p>${t.loadingTasks}</p>`;
 
   try {
     const q = query(collection(db, "tasks"), orderBy("createdAt", "desc"));
@@ -276,7 +464,7 @@ async function loadTasks() {
     tasksListContainer.innerHTML = "";
 
     if (querySnapshot.empty) {
-      tasksListContainer.innerHTML = "<p>Домашних заданий пока нет.</p>";
+      tasksListContainer.innerHTML = `<p>${t.noTasks}</p>`;
       return;
     }
 
@@ -286,13 +474,13 @@ async function loadTasks() {
       card.className = "card task-card";
       card.style.cssText = "margin-bottom: 12px; padding: 14px;";
 
-      // Преобразуем красивую дату сдачи
-      const formatDueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : 'Не указана';
+      const subjectTranslated = t.subjects[task.subject] || task.subject;
+      const formatDueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString(currentLang === 'uz' ? 'uz-UZ' : currentLang === 'en' ? 'en-US' : 'ru-RU', { day: 'numeric', month: 'long' }) : '-';
 
       card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <h4 style="margin: 0;">${task.subject}</h4>
-          <span style="font-size: 0.8rem; background: rgba(255,200,0,0.2); padding: 2px 8px; border-radius: 4px;">До: ${formatDueDate}</span>
+          <h4 style="margin: 0;">${subjectTranslated}</h4>
+          <span style="font-size: 0.8rem; background: rgba(255,200,0,0.2); padding: 2px 8px; border-radius: 4px;">${t.dueTo}: ${formatDueDate}</span>
         </div>
         <p style="margin: 0; font-size: 0.9rem; line-height: 1.4;">${task.description}</p>
       `;
@@ -302,13 +490,140 @@ async function loadTasks() {
 
   } catch (error) {
     console.error("Ошибка загрузки ДЗ:", error);
-    tasksListContainer.innerHTML = "<p>Ошибка загрузки заданий из базы.</p>";
   }
 }
 
 // -------------------------------------------------------------
-// 5. ДОПОЛНИТЕЛЬНЫЕ ЭЛЕМЕНТЫ И ИНТЕРФЕЙС
+// 6. КАЛЕНДАРЬ И РАСПИСАНИЕ
 // -------------------------------------------------------------
+function renderCalendar() {
+  const container = document.getElementById("calendarDays");
+  const monthYearHeader = document.getElementById("currentMonthYear");
+  if (!container) return;
+
+  const t = translations[currentLang] || translations.ru;
+  container.innerHTML = "";
+
+  const startOfWeek = new Date(selectedDate);
+  const dayIndex = startOfWeek.getDay();
+  const diffToMon = startOfWeek.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
+  startOfWeek.setDate(diffToMon);
+
+  if (monthYearHeader) {
+    monthYearHeader.innerText = `${t.monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+  }
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(startOfWeek);
+    day.setDate(startOfWeek.getDate() + i);
+
+    const isSelected = day.toDateString() === selectedDate.toDateString();
+    const dayOfWeek = day.getDay();
+    const month = day.getMonth();
+    const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
+
+    const dayEl = document.createElement("div");
+    dayEl.className = `day-col ${isSelected ? "active" : ""}`;
+    dayEl.innerHTML = `
+      <span class="day-name">${t.dayNames[i]}</span>
+      <span class="day-num ${isRedDay ? "is-red" : ""}">${day.getDate()}</span>
+    `;
+
+    dayEl.addEventListener("click", () => {
+      selectedDate = new Date(day);
+      renderCalendar();
+      renderScheduleForDate(selectedDate);
+    });
+
+    container.appendChild(dayEl);
+  }
+}
+
+function renderScheduleForDate(date) {
+  const scheduleContainer = document.getElementById("scheduleList");
+  const dateTitle = document.getElementById("selectedDateTitle");
+  if (!scheduleContainer) return;
+
+  const t = translations[currentLang] || translations.ru;
+  const dayOfWeek = date.getDay();
+  const locale = currentLang === 'uz' ? 'uz-UZ' : currentLang === 'en' ? 'en-US' : 'ru-RU';
+  
+  if (dateTitle) dateTitle.innerText = `${t.titleSchedule}: ${date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+  const schoolStart = new Date(2026, 8, 1);
+  scheduleContainer.innerHTML = "";
+
+  if (date < schoolStart) {
+    scheduleContainer.innerHTML = `
+      <div class="card vacation-card">
+        <h4>${t.vacationTitle}</h4>
+        <p>${t.vacationDesc}</p>
+      </div>`;
+    return;
+  }
+
+  const lessons = defaultSchedule[dayOfWeek] || [t.offDay];
+
+  lessons.forEach((lesson, index) => {
+    const translatedLesson = t.subjects[lesson] || (lesson === "Выходной день" ? t.offDay : lesson);
+    const card = document.createElement("div");
+    card.className = "card lesson-card";
+    card.innerHTML = `
+      <div class="lesson-num">${index + 1}</div>
+      <div class="lesson-info">
+        <h4 class="lesson-title active-term-text">${translatedLesson}</h4>
+      </div>
+    `;
+    scheduleContainer.appendChild(card);
+  });
+}
+
+// -------------------------------------------------------------
+// 7. ВСПОМОГАТЕЛЬНЫЕ ЭЛЕМЕНТЫ
+// -------------------------------------------------------------
+async function setupTeacherControls() {
+  if (!currentUserData) return;
+  const t = translations[currentLang] || translations.ru;
+
+  const teacherGradePanel = document.getElementById('teacherGradePanel');
+  const teacherTaskPanel = document.getElementById('teacherTaskPanel');
+
+  if (currentUserData.role === 'teacher') {
+    teacherGradePanel?.classList.remove('hidden');
+    teacherTaskPanel?.classList.remove('hidden');
+
+    const select = document.getElementById('gradeStudentSelect');
+    if (!select) return;
+
+    select.innerHTML = `<option value="" disabled selected>${t.loadingStudents}</option>`;
+
+    try {
+      const q = query(collection(db, "users"), where("role", "==", "student"));
+      const querySnapshot = await getDocs(q);
+
+      select.innerHTML = `<option value="" disabled selected>${t.selectStudent}</option>`;
+
+      if (querySnapshot.empty) {
+        select.innerHTML += `<option value="" disabled>${t.noStudents}</option>`;
+        return;
+      }
+
+      querySnapshot.forEach((docSnap) => {
+        const student = docSnap.data();
+        const option = document.createElement('option');
+        option.value = docSnap.id;
+        option.textContent = student.name || student.fullName || "Ученик";
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Ошибка загрузки учеников:", error);
+    }
+  } else {
+    teacherGradePanel?.classList.add('hidden');
+    teacherTaskPanel?.classList.add('hidden');
+  }
+}
+
 function setupLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (!logoutBtn) return;
@@ -339,127 +654,6 @@ function setupThemeToggle() {
     themeBtn.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("appTheme", newTheme);
   });
-}
-
-function renderCalendar() {
-  const container = document.getElementById("calendarDays");
-  const monthYearHeader = document.getElementById("currentMonthYear");
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  const startOfWeek = new Date(selectedDate);
-  const dayIndex = startOfWeek.getDay();
-  const diffToMon = startOfWeek.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
-  startOfWeek.setDate(diffToMon);
-
-  if (monthYearHeader) {
-    monthYearHeader.innerText = `${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
-  }
-
-  for (let i = 0; i < 7; i++) {
-    const day = new Date(startOfWeek);
-    day.setDate(startOfWeek.getDate() + i);
-
-    const isSelected = day.toDateString() === selectedDate.toDateString();
-    const dayOfWeek = day.getDay();
-    const month = day.getMonth();
-    const isRedDay = (month === 7) || (dayOfWeek === 0 || dayOfWeek === 6);
-
-    const dayEl = document.createElement("div");
-    dayEl.className = `day-col ${isSelected ? "active" : ""}`;
-    dayEl.innerHTML = `
-      <span class="day-name">${dayNames[i]}</span>
-      <span class="day-num ${isRedDay ? "is-red" : ""}">${day.getDate()}</span>
-    `;
-
-    dayEl.addEventListener("click", () => {
-      selectedDate = new Date(day);
-      renderCalendar();
-      renderScheduleForDate(selectedDate);
-    });
-
-    container.appendChild(dayEl);
-  }
-}
-
-function renderScheduleForDate(date) {
-  const scheduleContainer = document.getElementById("scheduleList");
-  const dateTitle = document.getElementById("selectedDateTitle");
-  if (!scheduleContainer) return;
-
-  const dayOfWeek = date.getDay();
-  const options = { day: 'numeric', month: 'long', year: 'numeric' };
-  if (dateTitle) dateTitle.innerText = `Расписание на ${date.toLocaleDateString('ru-RU', options)}`;
-
-  const schoolStart = new Date(2026, 8, 1);
-  scheduleContainer.innerHTML = "";
-
-  if (date < schoolStart) {
-    scheduleContainer.innerHTML = `
-      <div class="card vacation-card">
-        <h4>🌴 Летние каникулы</h4>
-        <p>Учебные занятия начнутся с 1 сентября 2026 года.</p>
-      </div>`;
-    return;
-  }
-
-  const lessons = defaultSchedule[dayOfWeek] || ["Выходной день"];
-
-  lessons.forEach((lesson, index) => {
-    const card = document.createElement("div");
-    card.className = "card lesson-card";
-    card.innerHTML = `
-      <div class="lesson-num">${index + 1}</div>
-      <div class="lesson-info">
-        <h4 class="lesson-title active-term-text">${lesson}</h4>
-      </div>
-    `;
-    scheduleContainer.appendChild(card);
-  });
-}
-
-async function setupTeacherControls() {
-  if (!currentUserData) return;
-
-  const teacherGradePanel = document.getElementById('teacherGradePanel');
-  const teacherTaskPanel = document.getElementById('teacherTaskPanel');
-
-  if (currentUserData.role === 'teacher') {
-    teacherGradePanel?.classList.remove('hidden');
-    teacherTaskPanel?.classList.remove('hidden');
-
-    const select = document.getElementById('gradeStudentSelect');
-    if (!select) return;
-
-    select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
-
-    try {
-      const q = query(collection(db, "users"), where("role", "==", "student"));
-      const querySnapshot = await getDocs(q);
-
-      select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
-
-      if (querySnapshot.empty) {
-        select.innerHTML += '<option value="" disabled>Ученики в базе не найдены</option>';
-        return;
-      }
-
-      querySnapshot.forEach((docSnap) => {
-        const student = docSnap.data();
-        const option = document.createElement('option');
-        option.value = docSnap.id;
-        option.textContent = student.name || student.fullName || "Ученик";
-        select.appendChild(option);
-      });
-    } catch (error) {
-      console.error("Ошибка загрузки учеников из Firestore:", error);
-      select.innerHTML = '<option value="" disabled selected>Ошибка загрузки списка</option>';
-    }
-  } else {
-    teacherGradePanel?.classList.add('hidden');
-    teacherTaskPanel?.classList.add('hidden');
-  }
 }
 
 function initBottomNav() {
