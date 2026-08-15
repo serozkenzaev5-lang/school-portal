@@ -8,127 +8,106 @@ import {
   setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==========================================
-// 1. СЛОВАРЬ ПЕРЕВОДОВ (RU / EN / UZ)
-// ==========================================
-const authTranslations = {
+// Переводы
+const translations = {
   ru: {
     portalTitle: "Школьный Портал",
     loginSubtitle: "Вход в личный кабинет",
     registerSubtitle: "Создайте новый аккаунт",
-    lblName: "Имя и Фамилия",
-    lblEmail: "Email",
-    lblPassword: "Пароль",
-    lblRole: "Ваша роль",
-    forgotPassword: "Забыли пароль?",
-    btnLogin: "Войти",
-    btnRegister: "Зарегистрироваться",
-    noAccountText: "Нет аккаунта?",
-    linkRegister: "Зарегистрироваться",
-    hasAccountText: "Уже есть аккаунт?",
-    linkLogin: "Войти",
-    roleDefault: "Выберите вашу роль",
-    roleStudent: "Ученик",
-    roleTeacher: "Учитель",
-    roleParent: "Родитель",
-    phName: "Иван Иванов"
+    email: "Email",
+    password: "Пароль",
+    name: "Имя и Фамилия",
+    role: "Ваша роль",
+    forgot: "Забыли пароль?",
+    loginBtn: "Войти",
+    regBtn: "Зарегистрироваться",
+    noAcc: "Нет аккаунта?",
+    toReg: "Зарегистрироваться",
+    hasAcc: "Уже есть аккаунт?",
+    toLogin: "Войти",
+    selectRole: "Выберите вашу роль",
+    student: "Ученик",
+    teacher: "Учитель",
+    parent: "Родитель"
   },
   en: {
     portalTitle: "School Portal",
     loginSubtitle: "Sign in to your account",
     registerSubtitle: "Create a new account",
-    lblName: "Full Name",
-    lblEmail: "Email",
-    lblPassword: "Password",
-    lblRole: "Your Role",
-    forgotPassword: "Forgot password?",
-    btnLogin: "Sign In",
-    btnRegister: "Register",
-    noAccountText: "Don't have an account?",
-    linkRegister: "Register",
-    hasAccountText: "Already have an account?",
-    linkLogin: "Sign In",
-    roleDefault: "Select your role",
-    roleStudent: "Student",
-    roleTeacher: "Teacher",
-    roleParent: "Parent",
-    phName: "John Doe"
+    email: "Email",
+    password: "Password",
+    name: "Full Name",
+    role: "Your Role",
+    forgot: "Forgot password?",
+    loginBtn: "Sign In",
+    regBtn: "Register",
+    noAcc: "Don't have an account?",
+    toReg: "Register",
+    hasAcc: "Already have an account?",
+    toLogin: "Sign In",
+    selectRole: "Select your role",
+    student: "Student",
+    teacher: "Teacher",
+    parent: "Parent"
   },
   uz: {
     portalTitle: "Maktab Portali",
     loginSubtitle: "Tizimga kirish",
     registerSubtitle: "Yangi hisob yaratish",
-    lblName: "Ism va Familiya",
-    lblEmail: "Email",
-    lblPassword: "Parol",
-    lblRole: "Sizning rolingiz",
-    forgotPassword: "Parolni unutdingizmi?",
-    btnLogin: "Kirish",
-    btnRegister: "Ro'yxatdan o'tish",
-    noAccountText: "Hisobingiz yo'qmi?",
-    linkRegister: "Ro'yxatdan o'tish",
-    hasAccountText: "Hisobingiz bormi?",
-    linkLogin: "Kirish",
-    roleDefault: "Rolingizni tanlang",
-    roleStudent: "O'quvchi",
-    roleTeacher: "O'qituvchi",
-    roleParent: "Ota-ona",
-    phName: "Ali Valiyev"
+    email: "Email",
+    password: "Parol",
+    name: "Ism va Familiya",
+    role: "Sizning rolingiz",
+    forgot: "Parolni unutdingizmi?",
+    loginBtn: "Kirish",
+    regBtn: "Ro'yxatdan o'tish",
+    noAcc: "Hisobingiz yo'qmi?",
+    toReg: "Ro'yxatdan o'tish",
+    hasAcc: "Hisobingiz bormi?",
+    toLogin: "Kirish",
+    selectRole: "Rolingizni tanlang",
+    student: "O'quvchi",
+    teacher: "O'qituvchi",
+    parent: "Ota-ona"
   }
 };
 
 let currentLang = localStorage.getItem("appLang") || "ru";
 let isRegisterMode = false;
 
-// ==========================================
-// 2. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  setupFormSwitching();
-  setupLanguageSelect();
-  setupThemeToggle();
-  applyAuthLanguage();
-  setupAuthHandlers();
+  initFormSwitch();
+  initLanguage();
+  initTheme();
+  initAuth();
 });
 
-// ==========================================
-// 3. ПЕРЕКЛЮЧЕНИЕ ВХОД / РЕГИСТРАЦИЯ
-// ==========================================
-function setupFormSwitching() {
+// Переключение Вход / Регистрация
+function initFormSwitch() {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
   const toRegisterLink = document.getElementById("toRegisterLink");
   const toLoginLink = document.getElementById("toLoginLink");
 
-  // Изначальное состояние полей
-  if (loginForm && registerForm) {
-    loginForm.style.display = "block";
-    registerForm.style.display = "none";
-  }
-
-  // Переход на страницу регистрации
   toRegisterLink?.addEventListener("click", (e) => {
     e.preventDefault();
     isRegisterMode = true;
-    if (loginForm) loginForm.style.display = "none";
-    if (registerForm) registerForm.style.display = "block";
-    applyAuthLanguage();
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+    updateLanguageTexts();
   });
 
-  // Переход на страницу входа
   toLoginLink?.addEventListener("click", (e) => {
     e.preventDefault();
     isRegisterMode = false;
-    if (registerForm) registerForm.style.display = "none";
-    if (loginForm) loginForm.style.display = "block";
-    applyAuthLanguage();
+    registerForm.style.display = "none";
+    loginForm.style.display = "block";
+    updateLanguageTexts();
   });
 }
 
-// ==========================================
-// 4. СМЕНА ЯЗЫКА И ОБНОВЛЕНИЕ ТЕКСТОВ
-// ==========================================
-function setupLanguageSelect() {
+// Переключение языков
+function initLanguage() {
   const langSelect = document.getElementById("langSelect");
   if (!langSelect) return;
 
@@ -136,107 +115,67 @@ function setupLanguageSelect() {
 
   langSelect.addEventListener("change", (e) => {
     currentLang = e.target.value;
-    localStorage.setItem("appLang", currentLang); // Сохраняем для Dashboard
-    applyAuthLanguage();
+    localStorage.setItem("appLang", currentLang);
+    updateLanguageTexts();
   });
+
+  updateLanguageTexts();
 }
 
-function applyAuthLanguage() {
-  const t = authTranslations[currentLang] || authTranslations.ru;
+function updateLanguageTexts() {
+  const t = translations[currentLang] || translations.ru;
 
-  // Заголовки
-  const portalTitle = document.getElementById("portalTitle");
-  if (portalTitle) portalTitle.innerText = t.portalTitle;
+  document.getElementById("portalTitle").innerText = t.portalTitle;
+  document.getElementById("authSubtitle").innerText = isRegisterMode ? t.registerSubtitle : t.loginSubtitle;
 
-  const authSubtitle = document.getElementById("authSubtitle");
-  if (authSubtitle) {
-    authSubtitle.innerText = isRegisterMode ? t.registerSubtitle : t.loginSubtitle;
-  }
+  document.getElementById("lblLoginEmail").innerText = t.email;
+  document.getElementById("lblLoginPassword").innerText = t.password;
+  document.getElementById("lblRegName").innerText = t.name;
+  document.getElementById("lblRegEmail").innerText = t.email;
+  document.getElementById("lblRegPassword").innerText = t.password;
+  document.getElementById("lblRegRole").innerText = t.role;
 
-  // Метки полей
-  const lblLoginEmail = document.getElementById("lblLoginEmail");
-  if (lblLoginEmail) lblLoginEmail.innerText = t.lblEmail;
+  document.getElementById("forgotPasswordBtn").innerText = t.forgot;
+  document.getElementById("btnLogin").innerText = t.loginBtn;
+  document.getElementById("btnRegister").innerText = t.regBtn;
 
-  const lblLoginPassword = document.getElementById("lblLoginPassword");
-  if (lblLoginPassword) lblLoginPassword.innerText = t.lblPassword;
+  document.getElementById("noAccountText").innerText = t.noAcc;
+  document.getElementById("toRegisterLink").innerText = t.toReg;
+  document.getElementById("hasAccountText").innerText = t.hasAcc;
+  document.getElementById("toLoginLink").innerText = t.toLogin;
 
-  const lblRegName = document.getElementById("lblRegName");
-  if (lblRegName) lblRegName.innerText = t.lblName;
-
-  const lblRegEmail = document.getElementById("lblRegEmail");
-  if (lblRegEmail) lblRegEmail.innerText = t.lblEmail;
-
-  const lblRegPassword = document.getElementById("lblRegPassword");
-  if (lblRegPassword) lblRegPassword.innerText = t.lblPassword;
-
-  const lblRegRole = document.getElementById("lblRegRole");
-  if (lblRegRole) lblRegRole.innerText = t.lblRole;
-
-  // Плейсхолдер
-  const regName = document.getElementById("regName");
-  if (regName) regName.placeholder = t.phName;
-
-  // Кнопки и ссылки
-  const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
-  if (forgotPasswordBtn) forgotPasswordBtn.innerText = t.forgotPassword;
-
-  const btnLogin = document.getElementById("btnLogin");
-  if (btnLogin) btnLogin.innerText = t.btnLogin;
-
-  const btnRegister = document.getElementById("btnRegister");
-  if (btnRegister) btnRegister.innerText = t.btnRegister;
-
-  const noAccountText = document.getElementById("noAccountText");
-  if (noAccountText) noAccountText.innerText = t.noAccountText;
-
-  const toRegisterLink = document.getElementById("toRegisterLink");
-  if (toRegisterLink) toRegisterLink.innerText = t.linkRegister;
-
-  const hasAccountText = document.getElementById("hasAccountText");
-  if (hasAccountText) hasAccountText.innerText = t.hasAccountText;
-
-  const toLoginLink = document.getElementById("toLoginLink");
-  if (toLoginLink) toLoginLink.innerText = t.linkLogin;
-
-  // Список ролей
   const regRole = document.getElementById("regRole");
   if (regRole && regRole.options.length >= 4) {
-    regRole.options[0].text = t.roleDefault;
-    regRole.options[1].text = t.roleStudent;
-    regRole.options[2].text = t.roleTeacher;
-    regRole.options[3].text = t.roleParent;
+    regRole.options[0].text = t.selectRole;
+    regRole.options[1].text = t.student;
+    regRole.options[2].text = t.teacher;
+    regRole.options[3].text = t.parent;
   }
 }
 
-// ==========================================
-// 5. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (Светлая / Темная)
-// ==========================================
-function setupThemeToggle() {
+// Тема
+function initTheme() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
 
-  const savedTheme = localStorage.getItem("appTheme") || "light-theme";
+  const savedTheme = localStorage.getItem("appTheme") || "dark-theme";
   document.body.className = savedTheme;
-  themeBtn.textContent = savedTheme === "dark-theme" ? "🌙" : "☀️";
+  themeBtn.textContent = savedTheme === "dark-theme" ? "☀️" : "🌙";
 
   themeBtn.addEventListener("click", () => {
     const isDark = document.body.classList.contains("dark-theme");
     const newTheme = isDark ? "light-theme" : "dark-theme";
-    
     document.body.className = newTheme;
     themeBtn.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("appTheme", newTheme);
   });
 }
 
-// ==========================================
-// 6. ОБРАБОТКА ФОРМ (Firebase)
-// ==========================================
-function setupAuthHandlers() {
+// Авторизация Firebase
+function initAuth() {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
 
-  // Авторизация
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("loginEmail").value.trim();
@@ -245,13 +184,11 @@ function setupAuthHandlers() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       window.location.href = "dashboard.html";
-    } catch (error) {
-      console.error("Ошибка входа:", error);
-      alert("Не удалось войти. Проверьте логин и пароль.");
+    } catch (err) {
+      alert("Ошибка входа: " + err.message);
     }
   });
 
-  // Регистрация
   registerForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("regName").value.trim();
@@ -259,26 +196,17 @@ function setupAuthHandlers() {
     const password = document.getElementById("regPassword").value;
     const role = document.getElementById("regRole").value;
 
-    if (!role) {
-      alert("Выберите вашу роль!");
-      return;
-    }
-
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        name: name,
-        email: email,
-        role: role,
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, "users", res.user.uid), {
+        name,
+        email,
+        role,
         createdAt: new Date().toISOString()
       });
-
       window.location.href = "dashboard.html";
-    } catch (error) {
-      console.error("Ошибка регистрации:", error);
-      alert("Ошибка при создании аккаунта.");
+    } catch (err) {
+      alert("Ошибка регистрации: " + err.message);
     }
   });
 }
