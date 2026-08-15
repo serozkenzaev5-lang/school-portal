@@ -1,153 +1,284 @@
 import { auth, db } from './firebase-config.js';
 import { 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail
+  createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
   doc, 
   setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const authMessage = document.getElementById('authMessage');
+// -------------------------------------------------------------
+// 1. СЛОВАРЬ ПЕРЕВОДОВ (i18n)
+// -------------------------------------------------------------
+const authTranslations = {
+  ru: {
+    portalTitle: "Школьный Портал",
+    loginSubtitle: "Вход в личный кабинет",
+    registerSubtitle: "Создайте новый аккаунт",
+    lblName: "Имя и Фамилия",
+    lblEmail: "Email",
+    lblPassword: "Пароль",
+    lblRole: "Ваша роль",
+    forgotPassword: "Забыли пароль?",
+    btnLogin: "Войти",
+    btnRegister: "Зарегистрироваться",
+    noAccountText: "Нет аккаунта?",
+    linkRegister: "Зарегистрироваться",
+    hasAccountText: "Уже есть аккаунт?",
+    linkLogin: "Войти",
+    roleDefault: "Выберите вашу роль",
+    roleStudent: "Ученик",
+    roleTeacher: "Учитель",
+    roleParent: "Родитель",
+    phName: "Иван Иванов",
+    phEmail: "name@school.com"
+  },
+  en: {
+    portalTitle: "School Portal",
+    loginSubtitle: "Sign in to your account",
+    registerSubtitle: "Create a new account",
+    lblName: "Full Name",
+    lblEmail: "Email",
+    lblPassword: "Password",
+    lblRole: "Your Role",
+    forgotPassword: "Forgot password?",
+    btnLogin: "Sign In",
+    btnRegister: "Register",
+    noAccountText: "Don't have an account?",
+    linkRegister: "Register",
+    hasAccountText: "Already have an account?",
+    linkLogin: "Sign In",
+    roleDefault: "Select your role",
+    roleStudent: "Student",
+    roleTeacher: "Teacher",
+    roleParent: "Parent",
+    phName: "John Doe",
+    phEmail: "name@school.com"
+  },
+  uz: {
+    portalTitle: "Maktab Portali",
+    loginSubtitle: "Tizimga kirish",
+    registerSubtitle: "Yangi hisob yaratish",
+    lblName: "Ism va Familiya",
+    lblEmail: "Email",
+    lblPassword: "Parol",
+    lblRole: "Sizning rolingiz",
+    forgotPassword: "Parolni unutdingizmi?",
+    btnLogin: "Kirish",
+    btnRegister: "Ro'yxatdan o'tish",
+    noAccountText: "Hisobingiz yo'qmi?",
+    linkRegister: "Ro'yxatdan o'tish",
+    hasAccountText: "Hisobingiz bormi?",
+    linkLogin: "Kirish",
+    roleDefault: "Rolingizni tanlang",
+    roleStudent: "O'quvchi",
+    roleTeacher: "O'qituvchi",
+    roleParent: "Ota-ona",
+    phName: "Ali Valiyev",
+    phEmail: "name@school.com"
+  }
+};
 
-function showMessage(msg, isError = true) {
-  if (!authMessage) return;
-  authMessage.textContent = msg;
-  authMessage.className = `auth-message ${isError ? 'error' : 'success'}`;
-  authMessage.classList.remove('hidden');
+let currentLang = localStorage.getItem("appLang") || "ru";
+let isRegisterMode = false;
+
+// -------------------------------------------------------------
+// ИНИЦИАЛИЗАЦИЯ
+// -------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  setupLanguageSelect();
+  applyAuthLanguage();
+  setupThemeToggle();
+  setupFormSwitching();
+  setupAuthHandlers();
+});
+
+// -------------------------------------------------------------
+// 2. СМЕНА ЯЗЫКА
+// -------------------------------------------------------------
+function setupLanguageSelect() {
+  const langSelect = document.getElementById("langSelect");
+  if (!langSelect) return;
+
+  langSelect.value = currentLang;
+
+  langSelect.addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    localStorage.setItem("appLang", currentLang); // Синхронизируем с Dashboard
+    applyAuthLanguage();
+  });
 }
 
-// 1. Вход в аккаунт
-const loginForm = document.getElementById('loginForm');
-loginForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const loginBtn = document.getElementById('loginBtn');
+function applyAuthLanguage() {
+  const t = authTranslations[currentLang] || authTranslations.ru;
 
-  if (loginBtn) {
-    loginBtn.disabled = true;
-    loginBtn.textContent = 'Проверка...';
+  // Заголовки
+  const portalTitle = document.getElementById("portalTitle");
+  if (portalTitle) portalTitle.innerText = t.portalTitle;
+
+  const authSubtitle = document.getElementById("authSubtitle");
+  if (authSubtitle) {
+    authSubtitle.innerText = isRegisterMode ? t.registerSubtitle : t.loginSubtitle;
   }
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    console.error("Ошибка входа:", error);
-    let errorMsg = "Неверный Email или пароль!";
+  // Лейблы полей ввода
+  const lblLoginEmail = document.getElementById("lblLoginEmail");
+  if (lblLoginEmail) lblLoginEmail.innerText = t.lblEmail;
 
-    if (error.code === 'auth/user-not-found') {
-      errorMsg = "Пользователь с таким Email не найден.";
-    } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-      errorMsg = "Вы ввели неверный пароль.";
-    } else if (error.code === 'auth/invalid-email') {
-      errorMsg = "Некорректный формат Email.";
-    } else if (error.code === 'auth/too-many-requests') {
-      errorMsg = "Слишком много попыток. Попробуйте позже.";
-    }
+  const lblLoginPassword = document.getElementById("lblLoginPassword");
+  if (lblLoginPassword) lblLoginPassword.innerText = t.lblPassword;
+
+  const lblRegName = document.getElementById("lblRegName");
+  if (lblRegName) lblRegName.innerText = t.lblName;
+
+  const lblRegEmail = document.getElementById("lblRegEmail");
+  if (lblRegEmail) lblRegEmail.innerText = t.lblEmail;
+
+  const lblRegPassword = document.getElementById("lblRegPassword");
+  if (lblRegPassword) lblRegPassword.innerText = t.lblPassword;
+
+  const lblRegRole = document.getElementById("lblRegRole");
+  if (lblRegRole) lblRegRole.innerText = t.lblRole;
+
+  // Плейсхолдеры
+  const regName = document.getElementById("regName");
+  if (regName) regName.placeholder = t.phName;
+
+  // Кнопки и ссылки
+  const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+  if (forgotPasswordBtn) forgotPasswordBtn.innerText = t.forgotPassword;
+
+  const btnLogin = document.getElementById("btnLogin");
+  if (btnLogin) btnLogin.innerText = t.btnLogin;
+
+  const btnRegister = document.getElementById("btnRegister");
+  if (btnRegister) btnRegister.innerText = t.btnRegister;
+
+  const noAccountText = document.getElementById("noAccountText");
+  if (noAccountText) noAccountText.innerText = t.noAccountText;
+
+  const toRegisterLink = document.getElementById("toRegisterLink");
+  if (toRegisterLink) toRegisterLink.innerText = t.linkRegister;
+
+  const hasAccountText = document.getElementById("hasAccountText");
+  if (hasAccountText) hasAccountText.innerText = t.hasAccountText;
+
+  const toLoginLink = document.getElementById("toLoginLink");
+  if (toLoginLink) toLoginLink.innerText = t.linkLogin;
+
+  // Выпадающий список ролей
+  const regRole = document.getElementById("regRole");
+  if (regRole && regRole.options.length >= 4) {
+    regRole.options[0].text = t.roleDefault;
+    regRole.options[1].text = t.roleStudent;
+    regRole.options[2].text = t.roleTeacher;
+    regRole.options[3].text = t.roleParent;
+  }
+}
+
+// -------------------------------------------------------------
+// 3. ПЕРЕКЛЮЧЕНИЕ ФОРМ (Вход / Регистрация)
+// -------------------------------------------------------------
+function setupFormSwitching() {
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+  const toRegisterLink = document.getElementById("toRegisterLink");
+  const toLoginLink = document.getElementById("toLoginLink");
+
+  toRegisterLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    isRegisterMode = true;
+    loginForm?.classList.add("hidden");
+    loginForm?.classList.remove("active");
+    registerForm?.classList.remove("hidden");
+    registerForm?.classList.add("active");
+    applyAuthLanguage();
+  });
+
+  toLoginLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    isRegisterMode = false;
+    registerForm?.classList.add("hidden");
+    registerForm?.classList.remove("active");
+    loginForm?.classList.remove("hidden");
+    loginForm?.classList.add("active");
+    applyAuthLanguage();
+  });
+}
+
+// -------------------------------------------------------------
+// 4. ТЕМА ИНТЕРФЕЙСА (☀️ / 🌙)
+// -------------------------------------------------------------
+function setupThemeToggle() {
+  const themeBtn = document.getElementById("themeToggle");
+  if (!themeBtn) return;
+
+  const savedTheme = localStorage.getItem("appTheme") || "light-theme";
+  document.body.className = savedTheme;
+  themeBtn.textContent = savedTheme === "dark-theme" ? "🌙" : "☀️";
+
+  themeBtn.addEventListener("click", () => {
+    const isDark = document.body.classList.contains("dark-theme");
+    const newTheme = isDark ? "light-theme" : "dark-theme";
     
-    showMessage(errorMsg, true);
-  } finally {
-    if (loginBtn) {
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Войти';
+    document.body.className = newTheme;
+    themeBtn.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("appTheme", newTheme);
+  });
+}
+
+// -------------------------------------------------------------
+// 5. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ В FIREBASE
+// -------------------------------------------------------------
+function setupAuthHandlers() {
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+
+  // Вход
+  loginForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch (error) {
+      console.error("Ошибка входа:", error);
+      alert("Не удалось войти. Проверьте Email и пароль.");
     }
-  }
-});
+  });
 
-// 2. Регистрация аккаунта
-const registerForm = document.getElementById('registerForm');
-registerForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  e.stopPropagation();
+  // Регистрация
+  registerForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("regName").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    const role = document.getElementById("regRole").value;
 
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const role = document.getElementById('regRole').value;
-  const regBtn = document.getElementById('regBtn');
-
-  if (regBtn) {
-    regBtn.disabled = true;
-    regBtn.textContent = 'Создание...';
-  }
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    await setDoc(doc(db, "users", user.uid), {
-      name: name,
-      email: email,
-      role: role
-    });
-
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    console.error("Ошибка регистрации:", error);
-    let errorMsg = "Ошибка регистрации.";
-    
-    if (error.code === 'auth/email-already-in-use') {
-      errorMsg = "Этот Email уже зарегистрирован!";
-    } else if (error.code === 'auth/weak-password') {
-      errorMsg = "Пароль слишком простой (минимум 6 символов).";
-    } else {
-      errorMsg += " " + error.message;
+    if (!role) {
+      alert("Пожалуйста, выберите вашу роль!");
+      return;
     }
-    
-    showMessage(errorMsg, true);
-  } finally {
-    if (regBtn) {
-      regBtn.disabled = false;
-      regBtn.textContent = 'Зарегистрироваться';
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Сохраняем имя и роль пользователя в Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+        role: role,
+        createdAt: new Date().toISOString()
+      });
+
+      window.location.href = "dashboard.html";
+    } catch (error) {
+      console.error("Ошибка регистрации:", error);
+      alert("Ошибка при регистрации. Проверьте правильность введенных данных.");
     }
-  }
-});
-
-// 3. Восстановление пароля
-const resetForm = document.getElementById('resetForm');
-resetForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const emailInput = document.getElementById('resetEmail');
-  const email = emailInput ? emailInput.value.trim() : "";
-  const resetBtn = document.getElementById('resetBtn');
-
-  if (!email) {
-    showMessage("Введите Email адрес.", true);
-    return;
-  }
-
-  if (resetBtn) {
-    resetBtn.disabled = true;
-    resetBtn.textContent = 'Отправка...';
-  }
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    showMessage(`Письмо со ссылкой отправлено на ${email}. Проверьте почту (и папку Спам)!`, false);
-  } catch (error) {
-    console.error("Ошибка восстановления:", error);
-    let errorMsg = "Не удалось отправить письмо.";
-    
-    if (error.code === 'auth/user-not-found') {
-      errorMsg = "Аккаунт с таким Email не зарегистрирован.";
-    } else if (error.code === 'auth/invalid-email') {
-      errorMsg = "Введите корректный Email адрес.";
-    } else {
-      errorMsg += " " + error.message;
-    }
-    
-    showMessage(errorMsg, true);
-  } finally {
-    if (resetBtn) {
-      resetBtn.disabled = false;
-      resetBtn.textContent = 'Сбросить пароль';
-    }
-  }
-});
+  });
+}
