@@ -8,9 +8,9 @@ import {
   setDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// -------------------------------------------------------------
-// 1. СЛОВАРЬ ПЕРЕВОДОВ (i18n)
-// -------------------------------------------------------------
+// ==========================================
+// 1. СЛОВАРЬ ПЕРЕВОДОВ (RU / EN / UZ)
+// ==========================================
 const authTranslations = {
   ru: {
     portalTitle: "Школьный Портал",
@@ -31,8 +31,7 @@ const authTranslations = {
     roleStudent: "Ученик",
     roleTeacher: "Учитель",
     roleParent: "Родитель",
-    phName: "Иван Иванов",
-    phEmail: "name@school.com"
+    phName: "Иван Иванов"
   },
   en: {
     portalTitle: "School Portal",
@@ -53,8 +52,7 @@ const authTranslations = {
     roleStudent: "Student",
     roleTeacher: "Teacher",
     roleParent: "Parent",
-    phName: "John Doe",
-    phEmail: "name@school.com"
+    phName: "John Doe"
   },
   uz: {
     portalTitle: "Maktab Portali",
@@ -75,28 +73,61 @@ const authTranslations = {
     roleStudent: "O'quvchi",
     roleTeacher: "O'qituvchi",
     roleParent: "Ota-ona",
-    phName: "Ali Valiyev",
-    phEmail: "name@school.com"
+    phName: "Ali Valiyev"
   }
 };
 
 let currentLang = localStorage.getItem("appLang") || "ru";
 let isRegisterMode = false;
 
-// -------------------------------------------------------------
-// ИНИЦИАЛИЗАЦИЯ
-// -------------------------------------------------------------
+// ==========================================
+// 2. ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  setupLanguageSelect();
-  applyAuthLanguage();
-  setupThemeToggle();
   setupFormSwitching();
+  setupLanguageSelect();
+  setupThemeToggle();
+  applyAuthLanguage();
   setupAuthHandlers();
 });
 
-// -------------------------------------------------------------
-// 2. СМЕНА ЯЗЫКА
-// -------------------------------------------------------------
+// ==========================================
+// 3. ПЕРЕКЛЮЧЕНИЕ ВХОД / РЕГИСТРАЦИЯ
+// ==========================================
+function setupFormSwitching() {
+  const loginForm = document.getElementById("loginForm");
+  const registerForm = document.getElementById("registerForm");
+  const toRegisterLink = document.getElementById("toRegisterLink");
+  const toLoginLink = document.getElementById("toLoginLink");
+
+  // Изначальное состояние полей
+  if (loginForm && registerForm) {
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+  }
+
+  // Переход на страницу регистрации
+  toRegisterLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    isRegisterMode = true;
+    if (loginForm) loginForm.style.display = "none";
+    if (registerForm) registerForm.style.display = "block";
+    applyAuthLanguage();
+  });
+
+  // Переход на страницу входа
+  toLoginLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    isRegisterMode = false;
+    if (registerForm) registerForm.style.display = "none";
+    if (loginForm) loginForm.style.display = "block";
+    applyAuthLanguage();
+  });
+}
+
+// ==========================================
+// 4. СМЕНА ЯЗЫКА И ОБНОВЛЕНИЕ ТЕКСТОВ
+// ==========================================
 function setupLanguageSelect() {
   const langSelect = document.getElementById("langSelect");
   if (!langSelect) return;
@@ -105,7 +136,7 @@ function setupLanguageSelect() {
 
   langSelect.addEventListener("change", (e) => {
     currentLang = e.target.value;
-    localStorage.setItem("appLang", currentLang); // Синхронизируем с Dashboard
+    localStorage.setItem("appLang", currentLang); // Сохраняем для Dashboard
     applyAuthLanguage();
   });
 }
@@ -122,7 +153,7 @@ function applyAuthLanguage() {
     authSubtitle.innerText = isRegisterMode ? t.registerSubtitle : t.loginSubtitle;
   }
 
-  // Лейблы полей ввода
+  // Метки полей
   const lblLoginEmail = document.getElementById("lblLoginEmail");
   if (lblLoginEmail) lblLoginEmail.innerText = t.lblEmail;
 
@@ -141,7 +172,7 @@ function applyAuthLanguage() {
   const lblRegRole = document.getElementById("lblRegRole");
   if (lblRegRole) lblRegRole.innerText = t.lblRole;
 
-  // Плейсхолдеры
+  // Плейсхолдер
   const regName = document.getElementById("regName");
   if (regName) regName.placeholder = t.phName;
 
@@ -167,7 +198,7 @@ function applyAuthLanguage() {
   const toLoginLink = document.getElementById("toLoginLink");
   if (toLoginLink) toLoginLink.innerText = t.linkLogin;
 
-  // Выпадающий список ролей
+  // Список ролей
   const regRole = document.getElementById("regRole");
   if (regRole && regRole.options.length >= 4) {
     regRole.options[0].text = t.roleDefault;
@@ -177,39 +208,9 @@ function applyAuthLanguage() {
   }
 }
 
-// -------------------------------------------------------------
-// 3. ПЕРЕКЛЮЧЕНИЕ ФОРМ (Вход / Регистрация)
-// -------------------------------------------------------------
-function setupFormSwitching() {
-  const loginForm = document.getElementById("loginForm");
-  const registerForm = document.getElementById("registerForm");
-  const toRegisterLink = document.getElementById("toRegisterLink");
-  const toLoginLink = document.getElementById("toLoginLink");
-
-  toRegisterLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    isRegisterMode = true;
-    loginForm?.classList.add("hidden");
-    loginForm?.classList.remove("active");
-    registerForm?.classList.remove("hidden");
-    registerForm?.classList.add("active");
-    applyAuthLanguage();
-  });
-
-  toLoginLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    isRegisterMode = false;
-    registerForm?.classList.add("hidden");
-    registerForm?.classList.remove("active");
-    loginForm?.classList.remove("hidden");
-    loginForm?.classList.add("active");
-    applyAuthLanguage();
-  });
-}
-
-// -------------------------------------------------------------
-// 4. ТЕМА ИНТЕРФЕЙСА (☀️ / 🌙)
-// -------------------------------------------------------------
+// ==========================================
+// 5. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (Светлая / Темная)
+// ==========================================
 function setupThemeToggle() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
@@ -228,14 +229,14 @@ function setupThemeToggle() {
   });
 }
 
-// -------------------------------------------------------------
-// 5. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ В FIREBASE
-// -------------------------------------------------------------
+// ==========================================
+// 6. ОБРАБОТКА ФОРМ (Firebase)
+// ==========================================
 function setupAuthHandlers() {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
 
-  // Вход
+  // Авторизация
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("loginEmail").value.trim();
@@ -246,7 +247,7 @@ function setupAuthHandlers() {
       window.location.href = "dashboard.html";
     } catch (error) {
       console.error("Ошибка входа:", error);
-      alert("Не удалось войти. Проверьте Email и пароль.");
+      alert("Не удалось войти. Проверьте логин и пароль.");
     }
   });
 
@@ -259,7 +260,7 @@ function setupAuthHandlers() {
     const role = document.getElementById("regRole").value;
 
     if (!role) {
-      alert("Пожалуйста, выберите вашу роль!");
+      alert("Выберите вашу роль!");
       return;
     }
 
@@ -267,7 +268,6 @@ function setupAuthHandlers() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Сохраняем имя и роль пользователя в Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: name,
         email: email,
@@ -278,7 +278,7 @@ function setupAuthHandlers() {
       window.location.href = "dashboard.html";
     } catch (error) {
       console.error("Ошибка регистрации:", error);
-      alert("Ошибка при регистрации. Проверьте правильность введенных данных.");
+      alert("Ошибка при создании аккаунта.");
     }
   });
 }
