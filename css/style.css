@@ -5,7 +5,7 @@ body.light-theme {
     --bg-main: #f0f4f9;
     --gradient-1: #6366f1;
     --gradient-2: #3b82f6;
-    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-bg: rgba(255, 255, 255, 0.95);
     --card-border: rgba(0, 0, 0, 0.08);
     --text-main: #0f172a;
     --text-muted: #64748b;
@@ -63,7 +63,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Размытые неоновые круги на фоне */
+/* Размытый фон */
 body::before,
 body::after {
     content: '';
@@ -71,7 +71,7 @@ body::after {
     border-radius: 50%;
     filter: blur(100px);
     z-index: -1;
-    opacity: 0.4;
+    opacity: 0.35;
 }
 
 body::before {
@@ -101,79 +101,79 @@ body::after {
     width: 100%;
     max-width: 420px;
     padding: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 .auth-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 24px;
-    padding: 28px 26px 32px 26px;
+    padding: 24px 28px 32px 28px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     transition: background-color 0.3s ease, border-color 0.3s ease;
-    position: relative;
     width: 100%;
-    max-width: 400px;
 }
 
-/* Верхняя панель (Переключатель языка и темы) */
+/* Верхняя панель: Элементы распределены по бокам */
 .auth-top-bar, .top-bar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    width: 100%;
+    margin-bottom: 16px;
 }
 
 .lang-select {
     background: var(--input-bg);
     color: var(--text-main);
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-    padding: 5px 10px;
+    border-radius: 10px;
+    padding: 6px 12px;
     font-size: 13px;
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
 .theme-btn, .theme-toggle-btn {
     background: var(--input-bg);
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-main);
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
 .theme-btn:hover, .theme-toggle-btn:hover, .lang-select:hover {
     border-color: var(--accent-blue);
 }
 
-/* Шапка карточки */
+/* Иконка и заголовки */
 .academic-cap, .school-logo {
     font-size: 42px;
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
 }
 
 .auth-header h1, .auth-header h2 {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     color: var(--text-main);
 }
 
@@ -183,7 +183,7 @@ body::after {
 }
 
 /* ==========================================================================
-   4. Формы, поля ввода (Input & Select) и ссылки
+   4. Формы, поля ввода (Input) и ссылки
    ========================================================================== */
 .auth-form {
     display: flex;
@@ -202,7 +202,6 @@ body::after {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-muted);
-    letter-spacing: 0.2px;
 }
 
 .label-row, .label-with-link {
@@ -216,14 +215,13 @@ body::after {
     color: var(--link-color);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s ease;
 }
 
 .forgot-link:hover, .link-secondary:hover {
     text-decoration: underline;
 }
 
-/* Стилизация всех Input и Select */
+/* Поля ввода */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -231,7 +229,7 @@ input[type="password"],
 .input-select,
 select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 13px 16px;
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: 12px;
@@ -247,7 +245,6 @@ input::placeholder {
     opacity: 0.7;
 }
 
-/* Эффект при фокусе */
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
@@ -258,23 +255,7 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* Стрелочка для Select */
-select {
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%94a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 40px;
-}
-
-select option {
-    background-color: var(--pill-bg);
-    color: var(--text-main);
-}
-
-/* Исправление автозаполнения браузера */
+/* Оформление автозаполнения */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
@@ -284,7 +265,7 @@ input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   5. Кнопки и Подвал
+   5. Кнопки и Подвал карточки
    ========================================================================== */
 .btn-submit, .btn-primary {
     width: 100%;
@@ -292,13 +273,13 @@ input:-webkit-autofill:focus {
     background-color: var(--accent-blue);
     color: #ffffff;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 600;
     border: none;
     border-radius: 12px;
     cursor: pointer;
     text-align: center;
+    margin-top: 8px;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    margin-top: 6px;
 }
 
 .btn-submit:hover, .btn-primary:hover {
@@ -311,7 +292,7 @@ input:-webkit-autofill:focus {
 
 .auth-footer, .auth-toggle {
     text-align: center;
-    margin-top: 18px;
+    margin-top: 20px;
     font-size: 14px;
     color: var(--text-muted);
     display: flex;
@@ -329,7 +310,7 @@ input:-webkit-autofill:focus {
     text-decoration: underline;
 }
 
-/* Уведомления и Ошибки */
+/* Сообщения об ошибках и успехе */
 .auth-message {
     padding: 12px;
     border-radius: 10px;
@@ -352,7 +333,7 @@ input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   6. Дашборд Приложения (Календарь, Карточки, Меню)
+   6. Дашборд (Календарь, Оценки, Меню)
    ========================================================================== */
 .app-layout {
     width: 100%;
@@ -398,13 +379,6 @@ input:-webkit-autofill:focus {
 .user-details h2 { font-size: 1.2rem; }
 .role-badge { font-size: 0.85rem; color: var(--text-muted); }
 
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Календарь */
 .calendar-section {
     padding: 20px 24px;
     border-bottom: 1px solid var(--card-border);
@@ -415,17 +389,15 @@ input:-webkit-autofill:focus {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-    padding: 0 8px;
 }
 
 .nav-arrow-btn {
     background: rgba(37, 99, 235, 0.1);
     color: var(--accent-blue);
     border: 1px solid var(--card-border);
-    font-size: 1.6rem;
-    font-weight: bold;
-    width: 42px;
-    height: 42px;
+    font-size: 1.4rem;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -450,50 +422,28 @@ input:-webkit-autofill:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 40px;
     cursor: pointer;
 }
 
-.day-name { font-size: 0.95rem; color: var(--text-muted); }
-.day-num { font-size: 1.15rem; font-weight: 600; color: var(--text-main); }
+.day-name { font-size: 0.9rem; color: var(--text-muted); }
+.day-num { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
 
-.day-num.is-red, .day-col .day-num.is-red {
-    color: var(--holiday-red);
-    font-weight: 700;
-}
+.day-num.is-red { color: var(--holiday-red); font-weight: 700; }
 
 .day-col.active .day-num {
     background: var(--accent-blue);
     color: #ffffff;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
     box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
 }
 
-.calendar-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.cal-pill {
-    background: var(--pill-bg);
-    border: 1px solid var(--card-border);
-    padding: 10px 20px;
-    border-radius: 14px;
-    font-weight: 600;
-    color: var(--text-main);
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-}
-
-/* Контент карточек */
 .app-content {
     flex: 1;
     padding: 24px;
@@ -519,40 +469,6 @@ input:-webkit-autofill:focus {
     gap: 16px;
 }
 
-.lesson-num {
-    width: 36px;
-    height: 36px;
-    background: var(--input-bg);
-    color: var(--accent-blue);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.grade-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--accent-blue);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.grade-badge.status-b { background-color: #f59e0b; color: #ffffff; }
-.grade-badge.status-p { background-color: #ef4444; color: #ffffff; }
-
-.grade-reason, .grade-date {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-/* Нижнее меню дашборда */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -587,7 +503,6 @@ input:-webkit-autofill:focus {
         margin: 20px auto;
         border-radius: 24px;
         overflow: hidden;
-        border: 1px solid var(--card-border);
     }
     .bottom-nav {
         max-width: 650px;
