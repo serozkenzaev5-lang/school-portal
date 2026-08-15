@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный Портал</title>
+    <title>Школьный Портал - Авторизация</title>
+    <!-- Подключаем CSS файл -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark-theme">
@@ -11,84 +12,90 @@
     <div class="auth-container">
         <div class="auth-card">
             
-            <!-- Шапка с кнопками переключения языка и темы -->
+            <!-- Верхняя панель: Язык и Тема -->
             <div class="auth-top-bar">
-                <select id="langSelect" class="lang-select">
+                <select class="lang-select" id="langSelect">
                     <option value="ru">RU</option>
-                    <option value="en">EN</option>
                     <option value="uz">UZ</option>
                 </select>
-                <button id="themeToggle" class="theme-btn">☀️</button>
+                <button class="theme-toggle-btn" id="themeToggleBtn" type="button">☀️</button>
             </div>
 
-            <!-- Иконка шапочки -->
-            <div class="auth-header">
-                <div class="academic-cap">🎓</div>
-                <h1 id="portalTitle">Школьный Портал</h1>
-                <p id="authSubtitle" class="subtitle">Вход в личный кабинет</p>
-            </div>
-
-            <!-- ФОРМА ВХОДА -->
-            <form id="loginForm" class="auth-form">
-                <div class="form-group">
-                    <label id="lblLoginEmail">Email</label>
-                    <input type="email" id="loginEmail" value="serozkenzaev5@gmail.com" required>
+            <!-- Блок ВХОДА -->
+            <div id="loginBlock">
+                <div class="auth-header">
+                    <div class="academic-cap">🎓</div>
+                    <h1>Школьный Портал</h1>
+                    <p class="subtitle">Вход в личный кабинет</p>
                 </div>
 
-                <div class="form-group">
-                    <div class="label-with-link">
-                        <label id="lblLoginPassword">Пароль</label>
-                        <a href="#" id="forgotPasswordBtn" class="forgot-link">Забыли пароль?</a>
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="input-text" placeholder="name@school.ru" required>
                     </div>
-                    <input type="password" id="loginPassword" value="••••••••••••" required>
-                </div>
 
-                <button type="submit" id="btnLogin" class="btn-submit">Войти</button>
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="loginPassword">Пароль</label>
+                            <a href="#" class="forgot-link">Забыли пароль?</a>
+                        </div>
+                        <input type="password" id="loginPassword" class="input-text" placeholder="••••••••" required>
+                    </div>
 
-                <div class="auth-footer">
-                    <span id="noAccountText">Нет аккаунта?</span>
-                    <a href="#" id="toRegisterLink">Зарегистрироваться</a>
-                </div>
-            </form>
-
-            <!-- ФОРМА РЕГИСТРАЦИИ -->
-            <form id="registerForm" class="auth-form" style="display: none;">
-                <div class="form-group">
-                    <label id="lblRegName">Имя и Фамилия</label>
-                    <input type="text" id="regName" placeholder="Иван Иванов" required>
-                </div>
-
-                <div class="form-group">
-                    <label id="lblRegEmail">Email</label>
-                    <input type="email" id="regEmail" placeholder="name@school.ru" required>
-                </div>
-
-                <div class="form-group">
-                    <label id="lblRegPassword">Пароль</label>
-                    <input type="password" id="regPassword" placeholder="••••••••••••" required>
-                </div>
-
-                <div class="form-group">
-                    <label id="lblRegRole">Ваша роль</label>
-                    <select id="regRole" required class="select-role">
-                        <option value="" disabled selected>Выберите вашу роль</option>
-                        <option value="student">Ученик</option>
-                        <option value="teacher">Учитель</option>
-                        <option value="parent">Родитель</option>
-                    </select>
-                </div>
-
-                <button type="submit" id="btnRegister" class="btn-submit">Зарегистрироваться</button>
+                    <button type="submit" class="btn-submit">Войти</button>
+                </form>
 
                 <div class="auth-footer">
-                    <span id="hasAccountText">Уже есть аккаунт?</span>
-                    <a href="#" id="toLoginLink">Войти</a>
+                    <span>Нет аккаунта?</span>
+                    <a href="#" class="link-primary" id="showRegisterBtn">Зарегистрироваться</a>
                 </div>
-            </form>
+            </div>
+
+            <!-- Блок РЕГИСТРАЦИИ (скрыт по умолчанию) -->
+            <div id="registerBlock" class="hidden">
+                <div class="auth-header">
+                    <div class="academic-cap">🎓</div>
+                    <h1>Школьный Портал</h1>
+                    <p class="subtitle">Создайте новый аккаунт</p>
+                </div>
+
+                <form class="auth-form" id="registerForm">
+                    <div class="form-group">
+                        <label for="regName">Имя и Фамилия</label>
+                        <input type="text" id="regName" class="input-text" placeholder="Иван Иванов" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" class="input-text" placeholder="name@school.ru" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPassword">Пароль</label>
+                        <input type="password" id="regPassword" class="input-text" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regRole">Ваша роль</label>
+                        <select id="regRole" class="input-select select-role" required>
+                            <option value="" disabled selected>Выберите вашу роль</option>
+                            <option value="student">Ученик</option>
+                            <option value="teacher">Учитель</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Зарегистрироваться</button>
+                </form>
+
+                <div class="auth-footer">
+                    <span>Уже есть аккаунт?</span>
+                    <a href="#" class="link-primary" id="showLoginBtn">Войти</a>
+                </div>
+            </div>
 
         </div>
     </div>
 
-    <script type="module" src="js/auth.js"></script>
 </body>
 </html>
