@@ -1,3 +1,8 @@
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Расписание по умолчанию
 const defaultSchedule = {
   1: ["Математика", "Русский язык", "История", "Физика"],
   2: ["Английский язык", "Информатика", "Геометрия", "Биология"],
@@ -11,27 +16,56 @@ const defaultSchedule = {
 const dayNames = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-let selectedDate = new Date();
-// Данные по умолчанию, чтобы сразу убрать "Загрузка..."
-let currentUserData = { id: "demo", name: "Хумаюн Чоршанбиев", role: "teacher" };
+const roleTranslations = {
+  teacher: "Учитель",
+  student: "Ученик",
+  parent: "Родитель"
+};
 
+let selectedDate = new Date();
+let currentUserData = null;
+
+// Инициализация интерфейса при загрузке страницы
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
 });
 
 function initDashboard() {
-  // 1. Сразу же выводим имя и аватар, не дожидаясь ответа сервера
-  updateUserProfileUI();
-
   renderCalendar();
   renderScheduleForDate(selectedDate);
   initBottomNav();
   setupThemeToggle();
+  setupLogout();
 
-  // 2. Безопасно пытаемся загрузить данные из Firebase
-  checkAuthState();
+  // Отслеживание состояния авторизации Firebase
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      let name = user.displayName || user.email || "Пользователь";
+      let role = "student";
 
-  // Кнопки календаря
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          name = userData.name || userData.fullName || name;
+          role = userData.role || role;
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки данных из Firestore:", e);
+      }
+
+      currentUserData = { id: user.uid, name, role };
+      updateUserProfileUI();
+      setupTeacherControls();
+    } else {
+      // Перенаправляем на страницу входа, если пользователь не авторизован
+      window.location.href = "index.html";
+    }
+  });
+
+  // Элементы управления календарем
   document.getElementById("prevWeekBtn")?.addEventListener("click", () => {
     selectedDate.setDate(selectedDate.getDate() - 7);
     renderCalendar();
@@ -51,49 +85,7 @@ function initDashboard() {
   });
 }
 
-// Безопасная проверка Firebase Auth & Firestore
-function checkAuthState() {
-  try {
-    const auth = (typeof firebase !== 'undefined' && firebase.auth) ? firebase.auth() : null;
-    const db = window.db || ((typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null);
-
-    if (!auth) {
-      console.warn("Firebase Auth не подключен. Используются локальные данные.");
-      setupTeacherControls();
-      return;
-    }
-
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        let name = user.displayName || user.email || "Пользователь";
-        let role = "student";
-
-        if (db) {
-          try {
-            const userDoc = await db.collection("users").doc(user.uid).get();
-            if (userDoc.exists) {
-              const userData = userDoc.data();
-              name = userData.name || userData.fullName || name;
-              role = userData.role || role;
-            }
-          } catch (e) {
-            console.error("Ошибка Firestore:", e);
-          }
-        }
-
-        currentUserData = { id: user.uid, name, role };
-        updateUserProfileUI();
-        setupTeacherControls();
-      } else {
-        setupTeacherControls();
-      }
-    });
-  } catch (err) {
-    console.error("Ошибка при работе с Firebase:", err);
-    setupTeacherControls();
-  }
-}
-
+// 1. ОБНОВЛЕНИЕ ПРОФИЛЯ В ШАПКЕ
 function updateUserProfileUI() {
   if (!currentUserData) return;
 
@@ -102,11 +94,13 @@ function updateUserProfileUI() {
   const avatarEl = document.getElementById("userAvatar");
 
   if (userNameEl) userNameEl.innerText = currentUserData.name;
-  if (userRoleEl) userRoleEl.innerText = currentUserData.role === 'teacher' ? 'Учитель' : 'Ученик';
+  if (userRoleEl) userRoleEl.innerText = roleTranslations[currentUserData.role] || currentUserData.role;
 
   if (avatarEl && currentUserData.name) {
     const initials = currentUserData.name
+      .trim()
       .split(" ")
+      .filter(part => part.length > 0)
       .map(part => part[0])
       .join("")
       .toUpperCase()
@@ -115,6 +109,22 @@ function updateUserProfileUI() {
   }
 }
 
+// 2. ВЫХОД ИЗ СИСТЕМЫ (🚪)
+function setupLogout() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      window.location.href = "index.html";
+    } catch (error) {
+      console.error("Ошибка при выходе:", error);
+    }
+  });
+}
+
+// 3. ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (☀️ / 🌙)
 function setupThemeToggle() {
   const themeBtn = document.getElementById("themeToggle");
   if (!themeBtn) return;
@@ -133,6 +143,7 @@ function setupThemeToggle() {
   });
 }
 
+// 4. ОТОБРАЖЕНИЕ КАЛЕНДАРЯ
 function renderCalendar() {
   const container = document.getElementById("calendarDays");
   const monthYearHeader = document.getElementById("currentMonthYear");
@@ -175,6 +186,7 @@ function renderCalendar() {
   }
 }
 
+// 5. ОТОБРАЖЕНИЕ РАСПИСАНИЯ
 function renderScheduleForDate(date) {
   const scheduleContainer = document.getElementById("scheduleList");
   const dateTitle = document.getElementById("selectedDateTitle");
@@ -211,6 +223,7 @@ function renderScheduleForDate(date) {
   });
 }
 
+// 6. НАСТРОЙКА ПАНЕЛЕЙ ДЛЯ УЧИТЕЛЯ
 async function setupTeacherControls() {
   if (!currentUserData) return;
 
@@ -220,34 +233,32 @@ async function setupTeacherControls() {
   if (currentUserData.role === 'teacher') {
     teacherGradePanel?.classList.remove('hidden');
     teacherTaskPanel?.classList.remove('hidden');
-    
+
     const select = document.getElementById('gradeStudentSelect');
     if (!select) return;
 
     select.innerHTML = '<option value="" disabled selected>Загрузка учеников...</option>';
 
-    const firestoreDb = window.db || ((typeof firebase !== 'undefined' && firebase.firestore) ? firebase.firestore() : null);
-
     try {
-      if (firestoreDb) {
-        const snapshot = await firestoreDb.collection("users").where("role", "==", "student").get();
-        select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
+      const q = query(collection(db, "users"), where("role", "==", "student"));
+      const querySnapshot = await getDocs(q);
 
-        if (snapshot.empty) {
-          select.innerHTML += '<option value="" disabled>Ученики в базе не найдены</option>';
-          return;
-        }
+      select.innerHTML = '<option value="" disabled selected>Выберите ученика</option>';
 
-        snapshot.forEach((doc) => {
-          const student = doc.data();
-          const option = document.createElement('option');
-          option.value = doc.id;
-          option.textContent = student.name || student.fullName || "Ученик";
-          select.appendChild(option);
-        });
+      if (querySnapshot.empty) {
+        select.innerHTML += '<option value="" disabled>Ученики в базе не найдены</option>';
+        return;
       }
+
+      querySnapshot.forEach((docSnap) => {
+        const student = docSnap.data();
+        const option = document.createElement('option');
+        option.value = docSnap.id;
+        option.textContent = student.name || student.fullName || "Ученик";
+        select.appendChild(option);
+      });
     } catch (error) {
-      console.error("Ошибка загрузки учеников из Firebase:", error);
+      console.error("Ошибка загрузки учеников из Firestore:", error);
       select.innerHTML = '<option value="" disabled selected>Ошибка загрузки списка</option>';
     }
   } else {
@@ -256,6 +267,7 @@ async function setupTeacherControls() {
   }
 }
 
+// 7. НАВИГАЦИЯ ПО ВКЛАДКАМ
 function initBottomNav() {
   const navItems = document.querySelectorAll('.bottom-nav .nav-item');
   const tabPages = document.querySelectorAll('.tab-page');
