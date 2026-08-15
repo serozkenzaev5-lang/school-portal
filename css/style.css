@@ -553,3 +553,98 @@ body::after {
         border-radius: 0 0 24px 24px;
     }
 }
+/* ==========================================================================
+   Дизайн полей ввода (Input, Select, Label)
+   ========================================================================== */
+
+/* 1. Обёртка поля и подпись (Label) */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8; /* Приятный серый цвет */
+    letter-spacing: 0.3px;
+}
+
+/* Строка с Забыли пароль? */
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-link {
+    font-size: 12px;
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+/* 2. Стиль самих полей (Input & Select) */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(15, 23, 42, 0.6); /* Полупрозрачный темный фон */
+    border: 1px solid rgba(255, 255, 255, 0.12); /* Тонкая аккуратная рамка */
+    border-radius: 12px;
+    color: #f8fafc; /* Светлый текст */
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.25s ease;
+}
+
+/* Стиль плейсхолдера (подсказки внутри) */
+input::placeholder {
+    color: #64748b;
+}
+
+/* 3. Эффект при клике / фокусе */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus {
+    border-color: #3b82f6; /* Синяя рамка при клике */
+    background-color: rgba(15, 23, 42, 0.85);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25); /* Мягкое свечение */
+}
+
+/* 4. Исправление уродливого автозаполнения браузера (Autofill Fix) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f8fafc !important;
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* 5. Стиль для выпадающего списка (Select) */
+select {
+    cursor: pointer;
+    appearance: none; /* Убираем стандартную стрелку браузера */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%94a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
