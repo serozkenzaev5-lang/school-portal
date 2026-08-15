@@ -3,101 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Школьный Портал - Авторизация</title>
-    <!-- Подключаем CSS файл -->
+    <title>Школьный Портал</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark-theme">
 
-    <div class="auth-container">
-        <div class="auth-card">
-            
-            <!-- Верхняя панель (Переключение языка и темы) -->
-            <div class="auth-top-bar">
-                <select class="lang-select" id="langSelect">
-                    <option value="ru">RU</option>
-                    <option value="uz">UZ</option>
-                </select>
-                <button class="theme-toggle-btn" id="themeToggleBtn" type="button">☀️</button>
+    <div class="auth-card">
+        <!-- Верхняя панель: Переключатель языка и темы -->
+        <div class="top-bar">
+            <select id="langSelect" class="lang-select">
+                <option value="ru">RU</option>
+                <option value="uz">UZ</option>
+                <option value="en">EN</option>
+            </select>
+            <button id="themeToggle" class="theme-btn" type="button">☀️</button>
+        </div>
+
+        <!-- Иконка шапки -->
+        <div class="academic-cap">🎓</div>
+
+        <!-- ================= БЛОК ВХОДА ================= -->
+        <div id="loginBlock">
+            <div class="auth-header">
+                <h1 id="loginTitle">Школьный Портал</h1>
+                <p id="loginSubtitle" class="subtitle">Вход в личный кабинет</p>
             </div>
 
-            <!-- БЛОК ВХОДА -->
-            <div id="loginBlock">
-                <div class="auth-header">
-                    <div class="academic-cap">🎓</div>
-                    <h1>Школьный Портал</h1>
-                    <p class="subtitle">Вход в личный кабинет</p>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label id="lblLoginEmail" for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="name@school.ru" required>
                 </div>
 
-                <form class="auth-form" id="loginForm">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" class="input-text" placeholder="name@school.ru" required>
+                <div class="form-group">
+                    <div class="label-row">
+                        <label id="lblLoginPassword" for="loginPassword">Пароль</label>
+                        <a href="#" id="forgotLink" class="forgot-link">Забыли пароль?</a>
                     </div>
-
-                    <div class="form-group">
-                        <div class="label-row">
-                            <label for="loginPassword">Пароль</label>
-                            <a href="#" class="forgot-link">Забыли пароль?</a>
-                        </div>
-                        <input type="password" id="loginPassword" class="input-text" placeholder="••••••••" required>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Войти</button>
-                </form>
-
-                <div class="auth-footer">
-                    <span>Нет аккаунта?</span>
-                    <a href="#" class="link-primary" id="showRegisterBtn">Зарегистрироваться</a>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
                 </div>
+
+                <button type="submit" id="btnLogin" class="btn-primary">Войти</button>
+            </form>
+
+            <div class="auth-footer">
+                <span id="noAccountText">Нет аккаунта?</span>
+                <a href="#" id="toRegisterLink" class="link-action">Зарегистрироваться</a>
+            </div>
+        </div>
+
+        <!-- ================= БЛОК РЕГИСТРАЦИИ ================= -->
+        <div id="registerBlock" class="hidden">
+            <div class="auth-header">
+                <h1 id="regTitle">Школьный Портал</h1>
+                <p id="regSubtitle" class="subtitle">Создайте новый аккаунт</p>
             </div>
 
-            <!-- БЛОК РЕГИСТРАЦИИ (скрыт по умолчанию) -->
-            <div id="registerBlock" class="hidden">
-                <div class="auth-header">
-                    <div class="academic-cap">🎓</div>
-                    <h1>Школьный Портал</h1>
-                    <p class="subtitle">Создайте новый аккаунт</p>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label id="lblRegName" for="regName">Имя и Фамилия</label>
+                    <input type="text" id="regName" placeholder="Иван Иванов" required>
                 </div>
 
-                <form class="auth-form" id="registerForm">
-                    <div class="form-group">
-                        <label for="regName">Имя и Фамилия</label>
-                        <input type="text" id="regName" class="input-text" placeholder="Иван Иванов" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regEmail">Email</label>
-                        <input type="email" id="regEmail" class="input-text" placeholder="name@school.ru" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regPassword">Пароль</label>
-                        <input type="password" id="regPassword" class="input-text" placeholder="••••••••" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regRole">Ваша роль</label>
-                        <select id="regRole" class="input-select select-role" required>
-                            <option value="" disabled selected>Выберите вашу роль</option>
-                            <option value="student">Ученик</option>
-                            <option value="teacher">Учитель</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Зарегистрироваться</button>
-                </form>
-
-                <div class="auth-footer">
-                    <span>Уже есть аккаунт?</span>
-                    <a href="#" class="link-primary" id="showLoginBtn">Войти</a>
+                <div class="form-group">
+                    <label id="lblRegEmail" for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="name@school.ru" required>
                 </div>
+
+                <div class="form-group">
+                    <label id="lblRegPassword" for="regPassword">Пароль</label>
+                    <input type="password" id="regPassword" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label id="lblRegRole" for="regRole">Ваша роль</label>
+                    <select id="regRole" required>
+                        <option value="" disabled selected id="optRoleDefault">Выберите вашу роль</option>
+                        <option value="student" id="optRoleStudent">Ученик</option>
+                        <option value="teacher" id="optRoleTeacher">Учитель</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="btnRegister" class="btn-primary">Зарегистрироваться</button>
+            </form>
+
+            <div class="auth-footer">
+                <span id="hasAccountText">Уже есть аккаунт?</span>
+                <a href="#" id="toLoginLink" class="link-action">Войти</a>
             </div>
-
         </div>
     </div>
 
-    <!-- Подключение скрипта логики -->
-    <script src="js/script.js"></script>
+    <!-- Встроенная логика переключений и языков (без ошибки 404) -->
+    <script>
+        const translations = {
+            ru: {
+                loginSubtitle: "Вход в личный кабинет",
+                regSubtitle: "Создайте новый аккаунт",
+                lblEmail: "Email",
+                lblPassword: "Пароль",
+                forgot: "Забыли пароль?",
+                btnLogin: "Войти",
+                noAccount: "Нет аккаунта?",
+                toRegister: "Зарегистрироваться",
+                lblName: "Имя и Фамилия",
+                lblRole: "Ваша роль",
+                optRoleDefault: "Выберите вашу роль",
+                optRoleStudent: "Ученик",
+                optRoleTeacher: "Учитель",
+                btnRegister: "Зарегистрироваться",
+                hasAccount: "Уже есть аккаунт?",
+                toLogin: "Войти"
+            },
+            uz: {
+                loginSubtitle: "Shaxsiy kabinetga kirish",
+                regSubtitle: "Yangi hisob yarating",
+                lblEmail: "Email",
+                lblPassword: "Parol",
+                forgot: "Parolni unutdingizmi?",
+                btnLogin: "Kirish",
+                noAccount: "Hisobingiz yo'qmi?",
+                toRegister: "Ro'yxatdan o'tish",
+                lblName: "Ism va Familiya",
+                lblRole: "Sizning rolingiz",
+                optRoleDefault: "Rolingizni tanlang",
+                optRoleStudent: "O'quvchi",
+                optRoleTeacher: "O'qituvchi",
+                btnRegister: "Ro'yxatdan o'tish",
+                hasAccount: "Hisobingiz bormi?",
+                toLogin: "Kirish"
+            },
+            en: {
+                loginSubtitle: "Log in to your account",
+                regSubtitle: "Create a new account",
+                lblEmail: "Email",
+                lblPassword: "Password",
+                forgot: "Forgot password?",
+                btnLogin: "Sign In",
+                noAccount: "Don't have an account?",
+                toRegister: "Sign Up",
+                lblName: "Full Name",
+                lblRole: "Your Role",
+                optRoleDefault: "Select your role",
+                optRoleStudent: "Student",
+                optRoleTeacher: "Teacher",
+                btnRegister: "Sign Up",
+                hasAccount: "Already have an account?",
+                toLogin: "Sign In"
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginBlock = document.getElementById('loginBlock');
+            const registerBlock = document.getElementById('registerBlock');
+            const toRegisterLink = document.getElementById('toRegisterLink');
+            const toLoginLink = document.getElementById('toLoginLink');
+            const forgotLink = document.getElementById('forgotLink');
+            const langSelect = document.getElementById('langSelect');
+            const themeToggle = document.getElementById('themeToggle');
+
+            // Переключение между Входом и Регистрацией
+            toRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginBlock.classList.add('hidden');
+                registerBlock.classList.remove('hidden');
+            });
+
+            toLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerBlock.classList.add('hidden');
+                loginBlock.classList.remove('hidden');
+            });
+
+            // Забыли пароль
+            forgotLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                if (email) {
+                    alert('Ссылка для восстановления отправлена на: ' + email);
+                } else {
+                    alert('Введите ваш Email');
+                }
+            });
+
+            // Переключение языка (RU / UZ / EN)
+            langSelect.addEventListener('change', (e) => {
+                const lang = e.target.value;
+                const t = translations[lang];
+
+                document.getElementById('loginSubtitle').textContent = t.loginSubtitle;
+                document.getElementById('regSubtitle').textContent = t.regSubtitle;
+                document.getElementById('lblLoginEmail').textContent = t.lblEmail;
+                document.getElementById('lblRegEmail').textContent = t.lblEmail;
+                document.getElementById('lblLoginPassword').textContent = t.lblPassword;
+                document.getElementById('lblRegPassword').textContent = t.lblPassword;
+                document.getElementById('forgotLink').textContent = t.forgot;
+                document.getElementById('btnLogin').textContent = t.btnLogin;
+                document.getElementById('noAccountText').textContent = t.noAccount;
+                document.getElementById('toRegisterLink').textContent = t.toRegister;
+                document.getElementById('lblRegName').textContent = t.lblName;
+                document.getElementById('lblRegRole').textContent = t.lblRole;
+                document.getElementById('optRoleDefault').textContent = t.optRoleDefault;
+                document.getElementById('optRoleStudent').textContent = t.optRoleStudent;
+                document.getElementById('optRoleTeacher').textContent = t.optRoleTeacher;
+                document.getElementById('btnRegister').textContent = t.btnRegister;
+                document.getElementById('hasAccountText').textContent = t.hasAccount;
+                document.getElementById('toLoginLink').textContent = t.toLogin;
+            });
+
+            // Переключение темы
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                themeToggle.textContent = document.body.classList.contains('light-theme') ? '🌙' : '☀️';
+            });
+        });
+    </script>
 </body>
 </html>
