@@ -1,42 +1,48 @@
 /* ==========================================================================
-   1. Переменные и система тем
+   1. Система переменных и Темы (Light & Dark)
    ========================================================================== */
 body.light-theme {
     --bg-main: #f0f4f9;
     --gradient-1: #6366f1;
     --gradient-2: #3b82f6;
-    --gradient-3: #93c5fd;
-    --card-bg: rgba(255, 255, 255, 0.88);
-    --card-border: rgba(255, 255, 255, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(0, 0, 0, 0.08);
     --text-main: #0f172a;
     --text-muted: #64748b;
     --accent-blue: #2563eb;
     --accent-hover: #1d4ed8;
+    --link-color: #2563eb;
     --holiday-red: #e11d48;
     --pill-bg: #ffffff;
     --input-bg: #f8fafc;
+    --input-border: #cbd5e1;
     --shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    --autofill-bg: #e8f0fe;
+    --autofill-text: #0f172a;
 }
 
 body.dark-theme {
-    --bg-main: #0b1329;
-    --gradient-1: #312e81;
+    --bg-main: #0b1120;
+    --gradient-1: #1e1b4b;
     --gradient-2: #1e3a8a;
-    --gradient-3: #1e1b4b;
-    --card-bg: #1e293b;
-    --card-border: #334155;
+    --card-bg: #1a2332;
+    --card-border: rgba(255, 255, 255, 0.1);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --accent-blue: #3b82f6;
-    --accent-hover: #60a5fa;
+    --accent-hover: #2563eb;
+    --link-color: #60a5fa;
     --holiday-red: #fb7185;
     --pill-bg: #1e293b;
     --input-bg: #0f172a;
-    --shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    --input-border: rgba(255, 255, 255, 0.12);
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    --autofill-bg: #0f172a;
+    --autofill-text: #f8fafc;
 }
 
 /* ==========================================================================
-   2. Базовые сбросы
+   2. Базовый сброс и Фон
    ========================================================================== */
 * {
     box-sizing: border-box;
@@ -57,39 +63,39 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Фон с размытыми кругами */
+/* Размытые неоновые круги на фоне */
 body::before,
 body::after {
     content: '';
     position: fixed;
     border-radius: 50%;
-    filter: blur(90px);
+    filter: blur(100px);
     z-index: -1;
-    opacity: 0.5;
+    opacity: 0.4;
 }
 
 body::before {
-    width: 350px;
-    height: 350px;
+    width: 380px;
+    height: 380px;
     background: var(--gradient-1);
-    top: -50px;
-    left: -50px;
+    top: -60px;
+    left: -60px;
 }
 
 body::after {
-    width: 400px;
-    height: 400px;
+    width: 420px;
+    height: 420px;
     background: var(--gradient-2);
-    bottom: -80px;
-    right: -80px;
+    bottom: -90px;
+    right: -90px;
 }
 
-.hidden { 
-    display: none !important; 
+.hidden {
+    display: none !important;
 }
 
 /* ==========================================================================
-   3. Страница Авторизации / Регистрации
+   3. Карточка авторизации и верхняя панель
    ========================================================================== */
 .auth-container {
     width: 100%;
@@ -100,16 +106,19 @@ body::after {
 .auth-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 28px 24px;
+    border-radius: 24px;
+    padding: 28px 26px 32px 26px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    width: 100%;
+    max-width: 400px;
 }
 
-/* Верхняя панель (Переключатель языков и темы) */
-.auth-top-bar {
+/* Верхняя панель (Переключатель языка и темы) */
+.auth-top-bar, .top-bar {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -120,18 +129,19 @@ body::after {
 .lang-select {
     background: var(--input-bg);
     color: var(--text-main);
-    border: 1px solid var(--card-border);
+    border: 1px solid var(--input-border);
     border-radius: 8px;
-    padding: 4px 8px;
+    padding: 5px 10px;
     font-size: 13px;
     font-weight: 600;
     outline: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .theme-btn, .theme-toggle-btn {
     background: var(--input-bg);
-    border: 1px solid var(--card-border);
+    border: 1px solid var(--input-border);
     border-radius: 8px;
     width: 32px;
     height: 32px;
@@ -141,22 +151,23 @@ body::after {
     cursor: pointer;
     font-size: 14px;
     color: var(--text-main);
-    transition: background 0.2s;
+    transition: all 0.2s ease;
 }
 
-.theme-btn:hover, .theme-toggle-btn:hover {
-    opacity: 0.8;
+.theme-btn:hover, .theme-toggle-btn:hover, .lang-select:hover {
+    border-color: var(--accent-blue);
 }
 
-/* Заголовок авторизации */
-.auth-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
+/* Шапка карточки */
 .academic-cap, .school-logo {
     font-size: 42px;
-    margin-bottom: 6px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 22px;
 }
 
 .auth-header h1, .auth-header h2 {
@@ -171,7 +182,9 @@ body::after {
     font-size: 14px;
 }
 
-/* Формы и Поля ввода */
+/* ==========================================================================
+   4. Формы, поля ввода (Input & Select) и ссылки
+   ========================================================================== */
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -181,61 +194,110 @@ body::after {
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    text-align: left;
 }
 
 .form-group label {
     font-size: 13px;
+    font-weight: 600;
     color: var(--text-muted);
-    font-weight: 500;
+    letter-spacing: 0.2px;
 }
 
-.label-with-link, .label-row {
+.label-row, .label-with-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .forgot-link, .link-secondary {
-    color: var(--accent-blue);
     font-size: 12px;
+    color: var(--link-color);
     text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
 }
 
 .forgot-link:hover, .link-secondary:hover {
     text-decoration: underline;
 }
 
-.input-text, .input-select, select.select-role {
+/* Стилизация всех Input и Select */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+.input-text,
+.input-select,
+select {
     width: 100%;
-    padding: 12px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
+    padding: 12px 16px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
     color: var(--text-main);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
-.input-text:focus, .input-select:focus, select.select-role:focus {
+input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Эффект при фокусе */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+.input-text:focus,
+.input-select:focus,
+select:focus {
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
-/* Кнопка */
+/* Стрелочка для Select */
+select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%94a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+select option {
+    background-color: var(--pill-bg);
+    color: var(--text-main);
+}
+
+/* Исправление автозаполнения браузера */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--autofill-text) !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--autofill-bg) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ==========================================================================
+   5. Кнопки и Подвал
+   ========================================================================== */
 .btn-submit, .btn-primary {
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     background-color: var(--accent-blue);
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     text-align: center;
-    transition: background 0.2s, transform 0.1s;
+    transition: background-color 0.2s ease, transform 0.1s ease;
     margin-top: 6px;
 }
 
@@ -247,10 +309,9 @@ body::after {
     transform: scale(0.98);
 }
 
-/* Подвал формы */
 .auth-footer, .auth-toggle {
     text-align: center;
-    margin-top: 14px;
+    margin-top: 18px;
     font-size: 14px;
     color: var(--text-muted);
     display: flex;
@@ -258,17 +319,17 @@ body::after {
     gap: 6px;
 }
 
-.auth-footer a, .link-primary {
-    color: var(--accent-blue);
+.auth-footer a, .link-primary, .link-action {
+    color: var(--link-color);
     text-decoration: none;
     font-weight: 600;
 }
 
-.auth-footer a:hover, .link-primary:hover {
+.auth-footer a:hover, .link-primary:hover, .link-action:hover {
     text-decoration: underline;
 }
 
-/* Ошибки и уведомления */
+/* Уведомления и Ошибки */
 .auth-message {
     padding: 12px;
     border-radius: 10px;
@@ -291,7 +352,7 @@ body::after {
 }
 
 /* ==========================================================================
-   4. Главный Лейаут Приложения (Дашборд)
+   6. Дашборд Приложения (Календарь, Карточки, Меню)
    ========================================================================== */
 .app-layout {
     width: 100%;
@@ -326,7 +387,7 @@ body::after {
     height: 48px;
     border-radius: 50%;
     background: var(--accent-blue);
-    color: #fff;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,25 +402,6 @@ body::after {
     display: flex;
     align-items: center;
     gap: 12px;
-}
-
-.lang-dropdown {
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid var(--card-border);
-    background: var(--input-bg);
-    color: var(--text-main);
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.9rem;
-    outline: none;
-}
-
-.icon-btn {
-    border: none;
-    background: none;
-    font-size: 1.3rem;
-    cursor: pointer;
 }
 
 /* Календарь */
@@ -416,8 +458,7 @@ body::after {
 .day-name { font-size: 0.95rem; color: var(--text-muted); }
 .day-num { font-size: 1.15rem; font-weight: 600; color: var(--text-main); }
 
-.day-num.is-red,
-.day-col .day-num.is-red {
+.day-num.is-red, .day-col .day-num.is-red {
     color: var(--holiday-red);
     font-weight: 700;
 }
@@ -452,7 +493,7 @@ body::after {
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-/* Контент и Карточки */
+/* Контент карточек */
 .app-content {
     flex: 1;
     padding: 24px;
@@ -511,7 +552,7 @@ body::after {
     color: var(--text-muted);
 }
 
-/* Нижнее меню */
+/* Нижнее меню дашборда */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -552,99 +593,4 @@ body::after {
         max-width: 650px;
         border-radius: 0 0 24px 24px;
     }
-}
-/* ==========================================================================
-   Дизайн полей ввода (Input, Select, Label)
-   ========================================================================== */
-
-/* 1. Обёртка поля и подпись (Label) */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-    text-align: left;
-}
-
-.form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #94a3b8; /* Приятный серый цвет */
-    letter-spacing: 0.3px;
-}
-
-/* Строка с Забыли пароль? */
-.label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.forgot-link {
-    font-size: 12px;
-    color: #60a5fa;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-}
-
-.forgot-link:hover {
-    color: #93c5fd;
-    text-decoration: underline;
-}
-
-/* 2. Стиль самих полей (Input & Select) */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
-    width: 100%;
-    padding: 12px 16px;
-    background-color: rgba(15, 23, 42, 0.6); /* Полупрозрачный темный фон */
-    border: 1px solid rgba(255, 255, 255, 0.12); /* Тонкая аккуратная рамка */
-    border-radius: 12px;
-    color: #f8fafc; /* Светлый текст */
-    font-size: 14px;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.25s ease;
-}
-
-/* Стиль плейсхолдера (подсказки внутри) */
-input::placeholder {
-    color: #64748b;
-}
-
-/* 3. Эффект при клике / фокусе */
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-select:focus {
-    border-color: #3b82f6; /* Синяя рамка при клике */
-    background-color: rgba(15, 23, 42, 0.85);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25); /* Мягкое свечение */
-}
-
-/* 4. Исправление уродливого автозаполнения браузера (Autofill Fix) */
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #f8fafc !important;
-    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-/* 5. Стиль для выпадающего списка (Select) */
-select {
-    cursor: pointer;
-    appearance: none; /* Убираем стандартную стрелку браузера */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%94a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 40px;
-}
-
-select option {
-    background-color: #0f172a;
-    color: #f8fafc;
 }
