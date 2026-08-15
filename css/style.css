@@ -139,6 +139,12 @@ body::after {
     transition: border-color 0.2s ease;
 }
 
+.lang-select option,
+select option {
+    background-color: var(--input-bg);
+    color: var(--text-main);
+}
+
 .theme-btn, .theme-toggle-btn {
     background: var(--input-bg);
     border: 1px solid var(--input-border);
