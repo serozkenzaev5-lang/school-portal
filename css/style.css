@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Переменные и система тем
+   1. Переменные и система тем
    ========================================================================== */
 body.light-theme {
     --bg-main: #f0f4f9;
@@ -19,12 +19,12 @@ body.light-theme {
 }
 
 body.dark-theme {
-    --bg-main: #0f172a;
+    --bg-main: #0b1329;
     --gradient-1: #312e81;
     --gradient-2: #1e3a8a;
     --gradient-3: #1e1b4b;
-    --card-bg: rgba(30, 41, 59, 0.85);
-    --card-border: rgba(255, 255, 255, 0.08);
+    --card-bg: #1e293b;
+    --card-border: #334155;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --accent-blue: #3b82f6;
@@ -35,12 +35,14 @@ body.dark-theme {
     --shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
+/* ==========================================================================
+   2. Базовые сбросы
+   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
@@ -52,8 +54,10 @@ body {
     align-items: center;
     position: relative;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Фон с размытыми кругами */
 body::before,
 body::after {
     content: '';
@@ -61,7 +65,7 @@ body::after {
     border-radius: 50%;
     filter: blur(90px);
     z-index: -1;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 body::before {
@@ -80,7 +84,215 @@ body::after {
     right: -80px;
 }
 
-/* Главная страница */
+.hidden { 
+    display: none !important; 
+}
+
+/* ==========================================================================
+   3. Страница Авторизации / Регистрации
+   ========================================================================== */
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Верхняя панель (Переключатель языков и темы) */
+.auth-top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.lang-select {
+    background: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+.theme-btn, .theme-toggle-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-main);
+    transition: background 0.2s;
+}
+
+.theme-btn:hover, .theme-toggle-btn:hover {
+    opacity: 0.8;
+}
+
+/* Заголовок авторизации */
+.auth-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.academic-cap, .school-logo {
+    font-size: 42px;
+    margin-bottom: 6px;
+}
+
+.auth-header h1, .auth-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.subtitle, .auth-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Формы и Поля ввода */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.label-with-link, .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-link, .link-secondary {
+    color: var(--accent-blue);
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.forgot-link:hover, .link-secondary:hover {
+    text-decoration: underline;
+}
+
+.input-text, .input-select, select.select-role {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-text:focus, .input-select:focus, select.select-role:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Кнопка */
+.btn-submit, .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--accent-blue);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 6px;
+}
+
+.btn-submit:hover, .btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-submit:active, .btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Подвал формы */
+.auth-footer, .auth-toggle {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.auth-footer a, .link-primary {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover, .link-primary:hover {
+    text-decoration: underline;
+}
+
+/* Ошибки и уведомления */
+.auth-message {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.auth-message.error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+.auth-message.success {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid #22c55e;
+    color: #86efac;
+}
+
+/* ==========================================================================
+   4. Главный Лейаут Приложения (Дашборд)
+   ========================================================================== */
 .app-layout {
     width: 100%;
     max-width: 650px;
@@ -122,14 +334,8 @@ body::after {
     font-size: 1.1rem;
 }
 
-.user-details h2 {
-    font-size: 1.2rem;
-}
-
-.role-badge {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
+.user-details h2 { font-size: 1.2rem; }
+.role-badge { font-size: 0.85rem; color: var(--text-muted); }
 
 .header-actions {
     display: flex;
@@ -137,7 +343,6 @@ body::after {
     gap: 12px;
 }
 
-/* Выбор языка */
 .lang-dropdown {
     padding: 6px 10px;
     border-radius: 10px;
@@ -173,8 +378,8 @@ body::after {
 
 .nav-arrow-btn {
     background: rgba(37, 99, 235, 0.1);
-    color: var(--accent-blue, #2563eb);
-    border: 1px solid var(--card-border, #e5e7eb);
+    color: var(--accent-blue);
+    border: 1px solid var(--card-border);
     font-size: 1.6rem;
     font-weight: bold;
     width: 42px;
@@ -188,7 +393,7 @@ body::after {
 }
 
 .nav-arrow-btn:hover {
-    background: var(--accent-blue, #2563eb);
+    background: var(--accent-blue);
     color: #ffffff;
 }
 
@@ -208,28 +413,18 @@ body::after {
     cursor: pointer;
 }
 
-.day-name {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-}
+.day-name { font-size: 0.95rem; color: var(--text-muted); }
+.day-num { font-size: 1.15rem; font-weight: 600; color: var(--text-main); }
 
-.day-num {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--text-main);
-}
-
-/* Красные даты для выходных и августа */
 .day-num.is-red,
 .day-col .day-num.is-red {
-    color: #e11d48 !important;
-    font-weight: 700 !important;
+    color: var(--holiday-red);
+    font-weight: 700;
 }
 
-/* Выбранный день */
 .day-col.active .day-num {
-    background: var(--accent-blue) !important;
-    color: #ffffff !important;
+    background: var(--accent-blue);
+    color: #ffffff;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -257,7 +452,7 @@ body::after {
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
-/* Контент и карточки */
+/* Контент и Карточки */
 .app-content {
     flex: 1;
     padding: 24px;
@@ -277,7 +472,7 @@ body::after {
     border: 1px solid var(--card-border);
 }
 
-.lesson-card {
+.lesson-card, .grade-card {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -295,39 +490,6 @@ body::after {
     font-weight: bold;
 }
 
-/* Формы учителя */
-.input-select,
-.input-text {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    background: var(--input-bg);
-    color: var(--text-main);
-    font-size: 0.95rem;
-    outline: none;
-}
-
-.btn-primary {
-    width: 100% !important;
-    padding: 14px !important;
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    cursor: pointer !important;
-    text-align: center !important;
-}
-
-/* Карточка оценки */
-.grade-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
 .grade-badge {
     width: 44px;
     height: 44px;
@@ -341,24 +503,11 @@ body::after {
     font-weight: bold;
 }
 
-.grade-badge.status-b {
-    background-color: #f59e0b !important; /* Болеет (оранжевый) */
-    color: #ffffff !important;
-}
+.grade-badge.status-b { background-color: #f59e0b; color: #ffffff; }
+.grade-badge.status-p { background-color: #ef4444; color: #ffffff; }
 
-.grade-badge.status-p {
-    background-color: #ef4444 !important; /* Прогулял (красный) */
-    color: #ffffff !important;
-}
-
-.grade-reason {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 2px 0;
-}
-
-.grade-date {
-    font-size: 0.8rem;
+.grade-reason, .grade-date {
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
@@ -389,11 +538,7 @@ body::after {
     cursor: pointer;
 }
 
-.nav-item.active {
-    color: var(--accent-blue);
-}
-
-.hidden { display: none !important; }
+.nav-item.active { color: var(--accent-blue); }
 
 @media (min-width: 768px) {
     .app-layout {
@@ -407,336 +552,4 @@ body::after {
         max-width: 650px;
         border-radius: 0 0 24px 24px;
     }
-}
-/* --- Современная страница авторизации --- */
-.auth-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #0f172a;
-    font-family: system-ui, -apple-system, sans-serif;
-    color: #f8fafc;
-}
-
-.auth-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.auth-card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 20px;
-    padding: 32px 24px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-}
-
-.auth-header {
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.school-logo {
-    font-size: 44px;
-    margin-bottom: 8px;
-}
-
-.auth-header h2 {
-    margin: 0 0 6px 0;
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.auth-header p {
-    margin: 0;
-    color: #94a3b8;
-    font-size: 14px;
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.form-group label {
-    font-size: 13px;
-    color: #cbd5e1;
-    font-weight: 500;
-}
-
-.label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.input-text, .input-select {
-    width: 100%;
-    padding: 12px 14px;
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 10px;
-    color: #ffffff;
-    font-size: 14px;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.input-text:focus, .input-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.btn-primary {
-    background: #2563eb;
-    color: #ffffff;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-}
-
-.btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-.btn-block {
-    width: 100%;
-    margin-top: 8px;
-}
-
-.link-primary {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.link-secondary {
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 12px;
-}
-
-.link-primary:hover, .link-secondary:hover {
-    text-decoration: underline;
-}
-
-.auth-toggle {
-    text-align: center;
-    margin-top: 16px;
-    margin-bottom: 0;
-    font-size: 14px;
-    color: #94a3b8;
-}
-
-.reset-info {
-    font-size: 13px;
-    color: #94a3b8;
-    margin: 0;
-    line-height: 1.4;
-}
-
-/* Ошибки и Уведомления */
-.auth-message {
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.auth-message.error {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
-    color: #fca5a5;
-}
-
-.auth-message.success {
-    background: rgba(34, 197, 94, 0.15);
-    border: 1px solid #22c55e;
-    color: #86efac;
-}
-
-.hidden {
-    display: none !important;
-}
-/* Кнопка смены темы на странице входа */
-.auth-container {
-    position: relative;
-}
-
-.theme-toggle-btn {
-    position: absolute;
-    top: -45px;
-    right: 20px;
-    background: transparent;
-    border: 1px solid #334155;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 18px;
-    transition: background 0.2s;
-}
-
-/* Светлая тема для страницы авторизации */
-body.light-theme.auth-page {
-    background-color: #f1f5f9;
-    color: #0f172a;
-}
-
-body.light-theme .auth-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-body.light-theme .auth-header h2 {
-    color: #0f172a;
-}
-
-body.light-theme .auth-header p,
-body.light-theme .form-group label,
-body.light-theme .auth-toggle,
-body.light-theme .reset-info {
-    color: #475569;
-}
-
-body.light-theme .input-text,
-body.light-theme .input-select {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #0f172a;
-}
-
-body.light-theme .theme-toggle-btn {
-    border-color: #cbd5e1;
-    color: #0f172a;
-}
-/* --- Стили карточки и темы авторизации --- */
-.auth-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Тёмная тема фона */
-body.dark-theme.auth-page {
-    background: #0b1329 !important;
-    color: #f8fafc !important;
-}
-
-/* Светлая тема фона */
-body.light-theme.auth-page {
-    background: #f1f5f9 !important;
-    color: #0f172a !important;
-}
-
-.auth-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.auth-card {
-    position: relative;
-    border-radius: 20px;
-    padding: 32px 24px;
-    transition: all 0.3s ease;
-}
-
-/* Карточка в тёмной теме */
-body.dark-theme .auth-card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-}
-
-/* Карточка в светлой теме */
-body.light-theme .auth-card {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-}
-
-/* Аккуратная кнопка переключения темы в углу карточки */
-.theme-toggle-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(148, 163, 184, 0.15);
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 10px;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.2s;
-}
-
-.theme-toggle-btn:hover {
-    background: rgba(148, 163, 184, 0.3);
-}
-
-/* Адаптация текста и полей под Светлую тему */
-body.light-theme .auth-header h2 { color: #0f172a; }
-body.light-theme .auth-header p,
-body.light-theme .form-group label,
-body.light-theme .auth-toggle,
-body.light-theme .reset-info { color: #475569; }
-
-body.light-theme .input-text,
-body.light-theme .input-select {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #0f172a;
-}
-
-/* Сообщения об ошибках */
-.auth-message {
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 16px;
-    font-weight: 500;
-}
-
-.auth-message.error {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
-    color: #f87171;
-}
-
-.auth-message.success {
-    background: rgba(34, 197, 94, 0.15);
-    border: 1px solid #22c55e;
-    color: #4ade80;
 }
