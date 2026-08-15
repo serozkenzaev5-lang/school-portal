@@ -54,6 +54,28 @@
                 </div>
             </div>
 
+            <!-- ================= БЛОК ВОССТАНОВЛЕНИЯ ПАРОЛЯ ================= -->
+            <div id="forgotBlock" class="hidden">
+                <div class="auth-header">
+                    <h1 id="forgotTitle">Восстановление пароля</h1>
+                    <p id="forgotSubtitle" class="subtitle">Введите ваш Email для получения инструкции</p>
+                </div>
+
+                <form id="forgotForm" class="auth-form">
+                    <div class="form-group">
+                        <label id="lblForgotEmail" for="forgotEmail">Email</label>
+                        <input type="email" id="forgotEmail" placeholder="name@school.ru" required>
+                    </div>
+
+                    <button type="submit" id="btnSendReset" class="btn-primary">Отправить инструкцию</button>
+                </form>
+
+                <div class="auth-footer">
+                    <span id="rememberPasswordText">Вспомнили пароль?</span>
+                    <a href="#" id="toLoginFromForgotLink" class="link-action">Войти</a>
+                </div>
+            </div>
+
             <!-- ================= БЛОК РЕГИСТРАЦИИ ================= -->
             <div id="registerBlock" class="hidden">
                 <div class="auth-header">
@@ -97,16 +119,19 @@
         </div>
     </div>
 
-    <!-- Встроенная логика переключений и языков (без ошибки 404) -->
+    <!-- Встроенная логика переключений и языков -->
     <script>
         const translations = {
             ru: {
                 loginSubtitle: "Вход в личный кабинет",
                 regSubtitle: "Создайте новый аккаунт",
+                forgotTitle: "Восстановление пароля",
+                forgotSubtitle: "Введите ваш Email для получения инструкции",
                 lblEmail: "Email",
                 lblPassword: "Пароль",
                 forgot: "Забыли пароль?",
                 btnLogin: "Войти",
+                btnSendReset: "Отправить инструкцию",
                 noAccount: "Нет аккаунта?",
                 toRegister: "Зарегистрироваться",
                 lblName: "Имя и Фамилия",
@@ -116,15 +141,19 @@
                 optRoleTeacher: "Учитель",
                 btnRegister: "Зарегистрироваться",
                 hasAccount: "Уже есть аккаунт?",
+                rememberPassword: "Вспомнили пароль?",
                 toLogin: "Войти"
             },
             uz: {
                 loginSubtitle: "Shaxsiy kabinetga kirish",
                 regSubtitle: "Yangi hisob yarating",
+                forgotTitle: "Parolni tiklash",
+                forgotSubtitle: "Yo'riqnomani olish uchun Emailingizni kiriting",
                 lblEmail: "Email",
                 lblPassword: "Parol",
                 forgot: "Parolni unutdingizmi?",
                 btnLogin: "Kirish",
+                btnSendReset: "Yo'riqnomani yuborish",
                 noAccount: "Hisobingiz yo'qmi?",
                 toRegister: "Ro'yxatdan o'tish",
                 lblName: "Ism va Familiya",
@@ -134,15 +163,19 @@
                 optRoleTeacher: "O'qituvchi",
                 btnRegister: "Ro'yxatdan o'tish",
                 hasAccount: "Hisobingiz bormi?",
+                rememberPassword: "Parol yodingizga tushdimi?",
                 toLogin: "Kirish"
             },
             en: {
                 loginSubtitle: "Log in to your account",
                 regSubtitle: "Create a new account",
+                forgotTitle: "Reset Password",
+                forgotSubtitle: "Enter your Email to receive instructions",
                 lblEmail: "Email",
                 lblPassword: "Password",
                 forgot: "Forgot password?",
                 btnLogin: "Sign In",
+                btnSendReset: "Send Instructions",
                 noAccount: "Don't have an account?",
                 toRegister: "Sign Up",
                 lblName: "Full Name",
@@ -152,6 +185,7 @@
                 optRoleTeacher: "Teacher",
                 btnRegister: "Sign Up",
                 hasAccount: "Already have an account?",
+                rememberPassword: "Remembered your password?",
                 toLogin: "Sign In"
             }
         };
@@ -159,33 +193,55 @@
         document.addEventListener('DOMContentLoaded', () => {
             const loginBlock = document.getElementById('loginBlock');
             const registerBlock = document.getElementById('registerBlock');
+            const forgotBlock = document.getElementById('forgotBlock');
+
             const toRegisterLink = document.getElementById('toRegisterLink');
             const toLoginLink = document.getElementById('toLoginLink');
             const forgotLink = document.getElementById('forgotLink');
+            const toLoginFromForgotLink = document.getElementById('toLoginFromForgotLink');
+            const forgotForm = document.getElementById('forgotForm');
+
             const langSelect = document.getElementById('langSelect');
             const themeToggle = document.getElementById('themeToggle');
 
-            // Переключение между Входом и Регистрацией
+            function showBlock(blockToShow) {
+                loginBlock.classList.add('hidden');
+                registerBlock.classList.add('hidden');
+                forgotBlock.classList.add('hidden');
+                blockToShow.classList.remove('hidden');
+            }
+
+            // Переход на Регистрацию
             toRegisterLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                loginBlock.classList.add('hidden');
-                registerBlock.classList.remove('hidden');
+                showBlock(registerBlock);
             });
 
+            // Переход на Вход из Регистрации
             toLoginLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                registerBlock.classList.add('hidden');
-                loginBlock.classList.remove('hidden');
+                showBlock(loginBlock);
             });
 
-            // Забыли пароль
+            // Переход на Восстановление Пароля
             forgotLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
+                showBlock(forgotBlock);
+            });
+
+            // Переход на Вход из Восстановления
+            toLoginFromForgotLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showBlock(loginBlock);
+            });
+
+            // Отправка формы восстановления пароля
+            forgotForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('forgotEmail').value;
                 if (email) {
-                    alert('Ссылка для восстановления отправлена на: ' + email);
-                } else {
-                    alert('Введите ваш Email');
+                    alert('Инструкция по восстановлению пароля отправлена на почту: ' + email);
+                    showBlock(loginBlock);
                 }
             });
 
@@ -196,14 +252,22 @@
 
                 document.getElementById('loginSubtitle').textContent = t.loginSubtitle;
                 document.getElementById('regSubtitle').textContent = t.regSubtitle;
+                document.getElementById('forgotTitle').textContent = t.forgotTitle;
+                document.getElementById('forgotSubtitle').textContent = t.forgotSubtitle;
+
                 document.getElementById('lblLoginEmail').textContent = t.lblEmail;
                 document.getElementById('lblRegEmail').textContent = t.lblEmail;
+                document.getElementById('lblForgotEmail').textContent = t.lblEmail;
+
                 document.getElementById('lblLoginPassword').textContent = t.lblPassword;
                 document.getElementById('lblRegPassword').textContent = t.lblPassword;
                 document.getElementById('forgotLink').textContent = t.forgot;
+
                 document.getElementById('btnLogin').textContent = t.btnLogin;
+                document.getElementById('btnSendReset').textContent = t.btnSendReset;
                 document.getElementById('noAccountText').textContent = t.noAccount;
                 document.getElementById('toRegisterLink').textContent = t.toRegister;
+
                 document.getElementById('lblRegName').textContent = t.lblName;
                 document.getElementById('lblRegRole').textContent = t.lblRole;
                 document.getElementById('optRoleDefault').textContent = t.optRoleDefault;
@@ -211,7 +275,9 @@
                 document.getElementById('optRoleTeacher').textContent = t.optRoleTeacher;
                 document.getElementById('btnRegister').textContent = t.btnRegister;
                 document.getElementById('hasAccountText').textContent = t.hasAccount;
+                document.getElementById('rememberPasswordText').textContent = t.rememberPassword;
                 document.getElementById('toLoginLink').textContent = t.toLogin;
+                document.getElementById('toLoginFromForgotLink').textContent = t.toLogin;
             });
 
             // Переключение темы
